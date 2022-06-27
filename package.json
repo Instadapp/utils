@@ -24,7 +24,7 @@
     "lint": "eslint --ext .ts,.js,.mjs,.cjs .",
     "prepack": "unbuild",
     "release": "yarn test && standard-version && git push --follow-tags && yarn publish",
-    "test": "yarn lint && vitest run"
+    "test": "yarn lint && vitest"
   },
   "dependencies": {
     "@ethersproject/address": "^5.6.1",
@@ -36,7 +36,9 @@
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/async-retry": "^1.4.4",
+    "@vitest/ui": "^0.16.0",
     "c8": "latest",
+    "dotenv": "^16.0.1",
     "eslint": "latest",
     "node-cache": "^5.1.2",
     "standard-version": "latest",

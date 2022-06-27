@@ -3,10 +3,31 @@ import NodeCache from 'node-cache'
 import { AbiFetcher, ICache } from '../src'
 import { mainnetUsdcImplementationAbi, mainnetUsdcProxyAbi, polygonMaticABI } from './fixtures'
 
+const defaultAbiCache = new NodeCache()
+
+const defaultAbiFetcher = new AbiFetcher({
+  retries: 2,
+  cache: {
+    get (key) {
+      return defaultAbiCache.get(key)
+    },
+    set (key, value) {
+      return defaultAbiCache.set(key, value, 60)
+    }
+  },
+  etherscanApiKey: {
+    mainnet: process.env.MAINNET_ETHERSCAN_API_KEY,
+    polygon: process.env.POLYGON_ETHERSCAN_API_KEY,
+    avalanche: process.env.AVLANCHE_ETHERSCAN_API_KEY,
+    arbitrum: process.env.ARBITRUM_ETHERSCAN_API_KEY,
+    optimism: process.env.OPTIMISM_ETHERSCAN_API_KEY,
+    fantom: process.env.FANTOM_ETHERSCAN_API_KEY
+  }
+})
+
 describe('abi', () => {
   test('can fetch abi', async () => {
-    const abiFetcher = new AbiFetcher()
-    const abi = await abiFetcher.get('0x0000000000000000000000000000000000001010', 'polygon')
+    const abi = await defaultAbiFetcher.get('0x0000000000000000000000000000000000001010', 'polygon')
 
     expect(abi).toEqual(polygonMaticABI)
   })
@@ -56,15 +77,13 @@ describe('abi', () => {
     const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
     const network = 'mainnet'
 
-    const abiFetcher = new AbiFetcher()
-
-    const proxyOnlyAbi = await abiFetcher.get(usdcAddress, network, 'proxyOnly')
+    const proxyOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'proxyOnly')
     expect(proxyOnlyAbi).toEqual(mainnetUsdcProxyAbi)
 
-    const implementationOnlyAbi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
+    const implementationOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'implementationOnly')
     expect(implementationOnlyAbi).toEqual(mainnetUsdcImplementationAbi)
 
-    const abi = await abiFetcher.get(usdcAddress, network, 'proxyAndImplementation')
+    const abi = await defaultAbiFetcher.get(usdcAddress, network, 'proxyAndImplementation')
     expect(abi).toEqual([...mainnetUsdcProxyAbi, ...mainnetUsdcImplementationAbi])
   })
 
@@ -72,22 +91,18 @@ describe('abi', () => {
     const usdcAddress = '0xc2132d05d31c914a87c6611c10748aeb04b58e8f'
     const network = 'polygon'
 
-    const abiFetcher = new AbiFetcher()
-
-    const proxyOnlyAbi = await abiFetcher.get(usdcAddress, network, 'proxyOnly')
+    const proxyOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'proxyOnly')
     expect(proxyOnlyAbi.length).toBeTruthy()
 
-    const implementationOnlyAbi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
+    const implementationOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'implementationOnly')
     expect(implementationOnlyAbi.length).toBeTruthy()
   })
 
   test('throw exception on bad address', async () => {
-    const abiFetcher = new AbiFetcher({ retries: 1 })
-    await expect(abiFetcher.get('asdasd', 'polygon')).rejects.toThrowError()
+    await expect(defaultAbiFetcher.get('asdasd', 'polygon')).rejects.toThrowError()
   })
 
   test('throw exception on EOA', async () => {
-    const abiFetcher = new AbiFetcher({ retries: 1 })
-    await expect(abiFetcher.get('0xA7366d1aE09e6fD6Cb43CFa39A2D5E43f120222c', 'polygon')).rejects.toThrowError()
+    await expect(defaultAbiFetcher.get('0xA7366d1aE09e6fD6Cb43CFa39A2D5E43f120222c', 'polygon')).rejects.toThrowError()
   })
 })
