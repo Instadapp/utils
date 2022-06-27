@@ -52,16 +52,16 @@ describe('abi', () => {
     expect(etherscan).toBeCalledTimes(1)
   })
 
-  test.only('can fetch proxy implementation', async () => {
-    const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
-    const network = 'mainnet'
+  // test('can fetch proxy implementation', async () => {
+  //   const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+  //   const network = 'mainnet'
 
-    const abiFetcher = new AbiFetcher()
+  //   const abiFetcher = new AbiFetcher()
 
-    const proxyOnlyAbi = await abiFetcher.get(usdcAddress, network, 'proxyOnly')
-    expect(proxyOnlyAbi).toEqual(mainnetUsdcProxyAbi)
+  //   const proxyOnlyAbi = await abiFetcher.get(usdcAddress, network, 'proxyOnly')
+  //   expect(proxyOnlyAbi).toEqual(mainnetUsdcProxyAbi)
 
-    const implementationOnlyabi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
-    expect(implementationOnlyabi).toEqual(mainnetUsdcImplementationAbi)
-  })
+  //   const implementationOnlyabi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
+  //   expect(implementationOnlyabi).toEqual(mainnetUsdcImplementationAbi)
+  // })
 })
