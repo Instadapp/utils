@@ -18,8 +18,8 @@ jobs:
         with:
           node-version: 16
           cache: "yarn"
-      - run: yarn install
+      - run: yarn
       - run: yarn lint
       - run: yarn build
-      - run: yarn vitest --coverage
+      - run: yarn test
       - uses: codecov/codecov-action@v3
