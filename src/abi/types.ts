@@ -7,7 +7,7 @@ export type StateMutabilityType = 'pure' | 'view' | 'nonpayable' | 'payable';
 
 export interface ICache {
     get(key: string): PromiseLike<JsonFragment[]> | JsonFragment[] | undefined;
-    set(key: string, value: JsonFragment[]): PromiseLike<boolean> | boolean
+    set(key: string, value: JsonFragment[]): PromiseLike<any> | any
 }
 
 export interface IAbiFetcherOptions {
