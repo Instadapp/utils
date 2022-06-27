@@ -11,7 +11,7 @@ describe('abi', () => {
     expect(abi).toEqual(polygonMaticABI)
   })
 
-  test('can define custom cache', async () => {
+  test('can define a custom cache', async () => {
     const abiCache = new NodeCache()
 
     const cache: ICache = {
@@ -52,7 +52,7 @@ describe('abi', () => {
     expect(etherscan).toBeCalledTimes(1)
   })
 
-  test.skip('can fetch proxy implementation', async () => {
+  test('can fetch proxy implementation - EIP-1967', async () => {
     const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
     const network = 'mainnet'
 
@@ -61,7 +61,23 @@ describe('abi', () => {
     const proxyOnlyAbi = await abiFetcher.get(usdcAddress, network, 'proxyOnly')
     expect(proxyOnlyAbi).toEqual(mainnetUsdcProxyAbi)
 
-    const implementationOnlyabi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
-    expect(implementationOnlyabi).toEqual(mainnetUsdcImplementationAbi)
+    const implementationOnlyAbi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
+    expect(implementationOnlyAbi).toEqual(mainnetUsdcImplementationAbi)
+
+    const abi = await abiFetcher.get(usdcAddress, network, 'proxyAndImplementation')
+    expect(abi).toEqual([...mainnetUsdcProxyAbi, ...mainnetUsdcImplementationAbi])
+  })
+
+  test('can fetch proxy implementation - EIP-897', async () => {
+    const usdcAddress = '0xc2132d05d31c914a87c6611c10748aeb04b58e8f'
+    const network = 'polygon'
+
+    const abiFetcher = new AbiFetcher()
+
+    const proxyOnlyAbi = await abiFetcher.get(usdcAddress, network, 'proxyOnly')
+    expect(proxyOnlyAbi.length).toBeTruthy()
+
+    const implementationOnlyAbi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
+    expect(implementationOnlyAbi.length).toBeTruthy()
   })
 })

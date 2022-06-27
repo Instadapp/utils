@@ -12,7 +12,7 @@ export interface ICache {
 
 export interface IAbiFetcherOptions {
     retries: number,
-    implementationStorageLocation: string,
+    implementationStorageLocations: string[],
     cache?: ICache
     etherscanApiKey?: Partial<Record<Network, string>>
     rpcProviderUrl: Partial<Record<Network, string>>
