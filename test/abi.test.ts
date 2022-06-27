@@ -1,7 +1,7 @@
 import { expect, describe, test, vi } from 'vitest'
 import NodeCache from 'node-cache'
 import { AbiFetcher, ICache } from '../src'
-import { polygonMaticABI } from './fixtures'
+import { mainnetUsdcImplementationAbi, mainnetUsdcProxyAbi, polygonMaticABI } from './fixtures'
 
 describe('abi', () => {
   test('can fetch abi', async () => {
@@ -52,10 +52,16 @@ describe('abi', () => {
     expect(etherscan).toBeCalledTimes(1)
   })
 
-  test('can fetch proxy implementation', async () => {
-    const abiFetcher = new AbiFetcher()
-    const abi = await abiFetcher.get('0x0000000000000000000000000000000000001010', 'polygon')
+  test.only('can fetch proxy implementation', async () => {
+    const usdcAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+    const network = 'mainnet'
 
-    expect(abi).toEqual(polygonMaticABI)
+    const abiFetcher = new AbiFetcher()
+
+    const proxyOnlyAbi = await abiFetcher.get(usdcAddress, network, 'proxyOnly')
+    expect(proxyOnlyAbi).toEqual(mainnetUsdcProxyAbi)
+
+    const implementationOnlyabi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
+    expect(implementationOnlyabi).toEqual(mainnetUsdcImplementationAbi)
   })
 })

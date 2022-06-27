@@ -87,9 +87,15 @@ export class AbiFetcher {
       let implementationAbi: JsonFragment[]
 
       if (originalAbi.some(item => item.type === 'function' && item.name === 'implementation')) {
-        const implementation = await provider.getStorageAt(contractAddress, implementationStorageLocation)
+        // EIP-897 DelegateProxy
+        if (originalAbi.some(item => item.type === 'function' && item.name === 'proxyType')) {
+          const contract = new Contract(contractAddress, originalAbi)
+          implementationAddress = await contract.implementation()
+        } else { //  EIP-1967: Standard Proxy Storage Slots
+          const implementation = await provider.getStorageAt(contractAddress, implementationStorageLocation)
+          implementationAddress = getAddress(`0x${implementation.slice(-40)}`)
+        }
 
-        implementationAddress = getAddress(`0x${implementation.slice(-40)}`)
         implementationAbi = await this._get(implementationAddress, network)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
       } else if (originalAbi.some(item => item.type === 'function' && item.name === 'getDummyImplementation')) {
