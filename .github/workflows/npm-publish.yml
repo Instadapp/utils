@@ -28,9 +28,3 @@ jobs:
         with:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
           tag: beta
-      - name: Publish Dev Release
-        if: "contains(github.ref, 'dev')"
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
-          tag: dev
