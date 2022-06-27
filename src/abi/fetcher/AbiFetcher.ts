@@ -41,6 +41,12 @@ export class AbiFetcher {
   private async _get (contractAddress: string, network: Network): Promise<JsonFragment[]> {
     const { cache, retries, networkToEtherscanAPI, etherscanApiKey } = this.options
 
+    try {
+      getAddress(contractAddress)
+    } catch (error) {
+      throw new Error('Invalid contract address')
+    }
+
     const cacheKey = `${network}:${contractAddress}`
 
     if (cache) {

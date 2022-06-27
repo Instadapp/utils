@@ -80,4 +80,14 @@ describe('abi', () => {
     const implementationOnlyAbi = await abiFetcher.get(usdcAddress, network, 'implementationOnly')
     expect(implementationOnlyAbi.length).toBeTruthy()
   })
+
+  test('throw exception on bad address', async () => {
+    const abiFetcher = new AbiFetcher({ retries: 1 })
+    await expect(abiFetcher.get('asdasd', 'polygon')).rejects.toThrowError()
+  })
+
+  test('throw exception on EOA', async () => {
+    const abiFetcher = new AbiFetcher({ retries: 1 })
+    await expect(abiFetcher.get('0xA7366d1aE09e6fD6Cb43CFa39A2D5E43f120222c', 'polygon')).rejects.toThrowError()
+  })
 })
