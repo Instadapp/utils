@@ -1,0 +1,47 @@
+{
+  "name": "@instadapp/utils",
+  "version": "0.0.1",
+  "description": "",
+  "repository": "instadapp/utils",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "vitest dev",
+    "lint": "eslint --ext .ts,.js,.mjs,.cjs .",
+    "prepack": "unbuild",
+    "release": "yarn test && standard-version && git push --follow-tags && yarn publish",
+    "test": "yarn lint && vitest run"
+  },
+  "dependencies": {
+    "@ethersproject/address": "^5.6.1",
+    "@ethersproject/contracts": "^5.6.2",
+    "@ethersproject/providers": "^5.6.8",
+    "async-retry": "^1.3.3",
+    "axios": "^0.27.2"
+  },
+  "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "latest",
+    "@types/async-retry": "^1.4.4",
+    "c8": "latest",
+    "eslint": "latest",
+    "node-cache": "^5.1.2",
+    "standard-version": "latest",
+    "typescript": "latest",
+    "unbuild": "latest",
+    "vitest": "latest"
+  }
+}
