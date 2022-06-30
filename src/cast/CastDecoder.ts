@@ -1,4 +1,4 @@
-import { Interface } from '@ethersproject/abi'
+import { Interface, defaultAbiCoder } from '@ethersproject/abi'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { AbiFetcher } from '../abi'
@@ -16,6 +16,9 @@ const DEFAULTS: ICastDecoderOptions = {
     fantom: '0x819910794a030403F69247E1e5C0bBfF1593B968'
   }
 }
+
+type AsyncReturnType<T extends (...args: any) => Promise<any>> =
+    T extends (...args: any) => Promise<infer R> ? R : any
 
 export class CastDecoder {
   options: ICastDecoderOptions
@@ -57,7 +60,7 @@ export class CastDecoder {
   }
 
   async getSpell (connectorName: string, data: string, network: Network = 'mainnet') {
-    const spell = { connector: connectorName, data, method: null, args: [], namedArgs: {} }
+    const spell = { connector: connectorName, data, method: null, args: [], namedArgs: {}, flashSpells: undefined }
 
     const abi = await this.getConnectorAbi(spell.connector, network)
 
@@ -74,13 +77,24 @@ export class CastDecoder {
       return acc
     }, {})
 
+    try {
+      if (spell.connector === 'INSTAPOOL-C' && ['flashBorrowAndCast', 'flashMultiBorrowAndCast'].includes(spell.method)) {
+        const [targets, spells] = defaultAbiCoder.decode(['string[]', 'bytes[]'], (spell.namedArgs as any).data)
+        spell.flashSpells = await this.getSpells({
+          targets,
+          spells
+        }, network)
+      }
+    } catch (error) {
+    }
+
     return spell
   }
 
-  async getSpells (data: string | { targets:string[], spells:string[]}, network: Network = 'mainnet') {
+  async getSpells (data: string | { targets: string[], spells: string[] }, network: Network = 'mainnet') {
     const encodedSpells = typeof data === 'string' ? this.getEncodedSpells(data) : data
 
-    const spells = []
+    const spells: AsyncReturnType<typeof this.getSpell>[] = []
     for (let index = 0; index < encodedSpells.targets.length; index++) {
       const spell = await this.getSpell(encodedSpells.targets[index], encodedSpells.spells[index], network)
 
