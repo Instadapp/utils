@@ -7,23 +7,14 @@ import { ICastDecoderOptions } from './types'
 const DSA_V2_CAST_ABI = ['function cast(string[] calldata _targetNames, bytes[] calldata _datas, address _origin)']
 const dsaV2Interface = new Interface(DSA_V2_CAST_ABI)
 const DEFAULTS: ICastDecoderOptions = {
-  rpcProviderUrl: {
-    polygon: 'https://rpc.ankr.com/polygon',
-    mainnet: 'https://rpc.ankr.com/eth',
-    avalanche: 'https://rpc.ankr.com/avalanche',
-    optimism: 'https://rpc.ankr.com/optimism',
-    arbitrum: 'https://rpc.ankr.com/arbitrum',
-    fantom: 'https://rpc.ankr.com/fantom'
+  instaConnectorsAddresses: {
+    polygon: '0x2A00684bFAb9717C21271E0751BCcb7d2D763c88',
+    mainnet: '0x97b0B3A8bDeFE8cB9563a3c610019Ad10DB8aD11',
+    avalanche: '0x127d8cD0E2b2E0366D522DeA53A787bfE9002C14',
+    optimism: '0x127d8cD0E2b2E0366D522DeA53A787bfE9002C14',
+    arbitrum: '0x67fCE99Dd6d8d659eea2a1ac1b8881c57eb6592B',
+    fantom: '0x819910794a030403F69247E1e5C0bBfF1593B968'
   }
-}
-
-const instaConnectorsAddresses: Record<Network, string> = {
-  polygon: '0x2A00684bFAb9717C21271E0751BCcb7d2D763c88',
-  mainnet: '0x97b0B3A8bDeFE8cB9563a3c610019Ad10DB8aD11',
-  avalanche: '0x127d8cD0E2b2E0366D522DeA53A787bfE9002C14',
-  optimism: '0x127d8cD0E2b2E0366D522DeA53A787bfE9002C14',
-  arbitrum: '0x67fCE99Dd6d8d659eea2a1ac1b8881c57eb6592B',
-  fantom: '0x819910794a030403F69247E1e5C0bBfF1593B968'
 }
 
 export class CastDecoder {
@@ -47,7 +38,7 @@ export class CastDecoder {
   }
 
   async getConnectorAbi (connectorName: string, network: Network = 'mainnet') {
-    const instaConnectorsAddress = instaConnectorsAddresses[network]
+    const instaConnectorsAddress = this.options.instaConnectorsAddresses[network]
 
     const contract = new Contract(instaConnectorsAddress, [
       {
@@ -58,7 +49,7 @@ export class CastDecoder {
         stateMutability: 'view',
         type: 'function'
       }
-    ], new JsonRpcProvider(this.options.rpcProviderUrl[network]))
+    ], new JsonRpcProvider(this.options.abiFetcher.options.rpcProviderUrl[network]))
 
     const contractAddress = await contract.connectors(connectorName)
 
