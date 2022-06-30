@@ -65,32 +65,35 @@ export class CastDecoder {
     return await this.options.abiFetcher.get(contractAddress, network)
   }
 
-  async getSpells (data: string, network: Network = 'mainnet') {
-    const encodedSpells = this.getEncodedSpells(data)
+  async getSpell (connectorName: string, data: string, network: Network = 'mainnet') {
+    const spell = { connector: connectorName, data, method: null, args: [], namedArgs: {} }
 
-    const spells = encodedSpells.targets.map((target, index) => ({
-      connector: target,
-      data: encodedSpells.spells[index],
-      method: null,
-      args: [],
-      namedArgs: {}
-    }))
+    const abi = await this.getConnectorAbi(spell.connector, network)
 
-    for (const spell of spells) {
-      const abi = await this.getConnectorAbi(spell.connector, network)
+    const connector = new Interface(abi)
 
-      const connector = new Interface(abi)
+    const tx = connector.parseTransaction({ data: spell.data })
 
-      const tx = connector.parseTransaction({ data: spell.data })
+    spell.method = tx.name
+    spell.args = [...tx.args].map(String)
+    spell.namedArgs = Object.keys({ ...tx.args }).reduce((acc, key) => {
+      if (isNaN(Number(key))) {
+        acc[key] = String(tx.args[key])
+      }
+      return acc
+    }, {})
 
-      spell.method = tx.name
-      spell.args = [...tx.args].map(String)
-      spell.namedArgs = Object.keys({ ...tx.args }).reduce((acc, key) => {
-        if (isNaN(Number(key))) {
-          acc[key] = String(tx.args[key])
-        }
-        return acc
-      }, {})
+    return spell
+  }
+
+  async getSpells (data: string | { targets:string[], spells:string[]}, network: Network = 'mainnet') {
+    const encodedSpells = typeof data === 'string' ? this.getEncodedSpells(data) : data
+
+    const spells = []
+    for (let index = 0; index < encodedSpells.targets.length; index++) {
+      const spell = await this.getSpell(encodedSpells.targets[index], encodedSpells.spells[index], network)
+
+      spells.push(spell)
     }
 
     return spells

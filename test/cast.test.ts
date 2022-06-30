@@ -73,19 +73,86 @@ describe('cast', () => {
 
     const decodedSpells = await castDecoder.getSpells(encodedData, 'mainnet')
 
-    expect(decodedSpells).toEqual([
-      {
-        connector: 'AAVE-V2-A',
-        data: encodedSpells.spells[0],
-        method: 'deposit',
-        args: [token, amount, '0', '0'],
-        namedArgs: {
-          amt: amount,
-          getId: '0',
-          setId: '0',
-          token
-        }
+    const expectedDecodedSpell =
+    {
+      connector: 'AAVE-V2-A',
+      data: encodedSpells.spells[0],
+      method: 'deposit',
+      args: [token, amount, '0', '0'],
+      namedArgs: {
+        amt: amount,
+        getId: '0',
+        setId: '0',
+        token
       }
-    ])
+    }
+
+    expect(decodedSpells).toEqual([expectedDecodedSpell])
+  })
+
+  test('can decode single spell', async () => {
+    const spells = dsa.Spell()
+
+    const token = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+    const amount = Web3.utils.toWei('0.002', 'ether')
+
+    spells.add({
+      connector: 'AAVE-V2-A',
+      method: 'deposit',
+      args: [token, amount, 0, 0]
+    })
+
+    const encodedSpells = dsa.encodeSpells(spells)
+
+    const decodedSpell = await castDecoder.getSpell('AAVE-V2-A', encodedSpells.spells[0], 'mainnet')
+
+    const expectedDecodedSpell =
+    {
+      connector: 'AAVE-V2-A',
+      data: encodedSpells.spells[0],
+      method: 'deposit',
+      args: [token, amount, '0', '0'],
+      namedArgs: {
+        amt: amount,
+        getId: '0',
+        setId: '0',
+        token
+      }
+    }
+
+    expect(decodedSpell).toEqual(expectedDecodedSpell)
+  })
+
+  test('can get spells from struct', async () => {
+    const spells = dsa.Spell()
+
+    const token = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+    const amount = Web3.utils.toWei('0.002', 'ether')
+
+    spells.add({
+      connector: 'AAVE-V2-A',
+      method: 'deposit',
+      args: [token, amount, 0, 0]
+    })
+
+    const encodedSpells = dsa.encodeSpells(spells)
+
+    const decodedSpells = await castDecoder.getSpells(encodedSpells as any, 'mainnet')
+
+    const expectedDecodedSpell =
+    {
+      connector: 'AAVE-V2-A',
+      data: encodedSpells.spells[0],
+      method: 'deposit',
+      args: [token, amount, '0', '0'],
+      namedArgs: {
+        amt: amount,
+        getId: '0',
+        setId: '0',
+        token
+      }
+    }
+
+    expect(decodedSpells).toEqual([expectedDecodedSpell])
   })
 })
