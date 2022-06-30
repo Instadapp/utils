@@ -60,7 +60,7 @@ export class CastDecoder {
   }
 
   async getSpell (connectorName: string, data: string, network: Network = 'mainnet') {
-    const spell = { connector: connectorName, data, method: null, args: [], namedArgs: {}, flashSpells: undefined }
+    const spell = { connector: connectorName, data, method: null, args: [], namedArgs: {}, flashloanSpells: undefined }
 
     const abi = await this.getConnectorAbi(spell.connector, network)
 
@@ -80,7 +80,7 @@ export class CastDecoder {
     try {
       if (spell.connector === 'INSTAPOOL-C' && ['flashBorrowAndCast', 'flashMultiBorrowAndCast'].includes(spell.method)) {
         const [targets, spells] = defaultAbiCoder.decode(['string[]', 'bytes[]'], (spell.namedArgs as any).data)
-        spell.flashSpells = await this.getSpells({
+        spell.flashloanSpells = await this.getSpells({
           targets,
           spells
         }, network)

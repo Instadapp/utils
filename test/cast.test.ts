@@ -161,6 +161,6 @@ describe('cast', () => {
 
     const decodedSpells = await castDecoder.getSpells(flashCastData, 'mainnet')
 
-    expect(decodedSpells[0].flashSpells).toBeDefined()
+    expect(decodedSpells[0].flashloanSpells).toBeDefined()
   })
 })
