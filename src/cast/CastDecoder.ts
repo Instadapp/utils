@@ -46,7 +46,7 @@ export class CastDecoder {
     }
   }
 
-  async getConnectorAbi (connectorName: string, network: Network) {
+  async getConnectorAbi (connectorName: string, network: Network = 'mainnet') {
     const instaConnectorsAddress = instaConnectorsAddresses[network]
 
     const contract = new Contract(instaConnectorsAddress, [
@@ -65,7 +65,7 @@ export class CastDecoder {
     return await this.options.abiFetcher.get(contractAddress, network)
   }
 
-  async getSpells (data: string, network: Network) {
+  async getSpells (data: string, network: Network = 'mainnet') {
     const encodedSpells = this.getEncodedSpells(data)
 
     const spells = encodedSpells.targets.map((target, index) => ({
