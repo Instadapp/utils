@@ -4,7 +4,8 @@ import { Contract } from '@ethersproject/contracts'
 import retry from 'async-retry'
 import axios from 'axios'
 import type { JsonFragment } from '@ethersproject/abi'
-import { IAbiFetcherOptions, Network, ProxyFetchMode } from '../types'
+import { IAbiFetcherOptions, ProxyFetchMode } from '../types'
+import { Network } from '../../types'
 
 const DEFAULTS: IAbiFetcherOptions = {
   retries: 3,

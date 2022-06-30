@@ -1,6 +1,6 @@
 {
   "name": "@instadapp/utils",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "repository": "instadapp/utils",
   "license": "MIT",
@@ -39,11 +39,13 @@
     "@vitest/ui": "^0.16.0",
     "c8": "latest",
     "dotenv": "^16.0.1",
+    "dsa-connect": "^0.6.17",
     "eslint": "latest",
     "node-cache": "^5.1.2",
     "standard-version": "latest",
     "typescript": "latest",
     "unbuild": "latest",
-    "vitest": "latest"
+    "vitest": "latest",
+    "web3": "^1.7.4"
   }
 }
