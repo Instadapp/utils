@@ -164,8 +164,8 @@ describe('cast', () => {
     expect(decodedSpells[0].flashloanSpells).toBeDefined()
   })
 
-  test.only('can decode connector event', async () => {
-    const args = await castDecoder.getConnectorEventArgs(
+  test('can decode connector event', async () => {
+    const args = await castDecoder.getEventNamedArgs(
       'BASIC-A',
       'LogWithdraw(address,uint256,address,uint256,uint256)',
       '0x00000000000000000000000003ab458634910aad20ef5f1c8ee96f1d6ac549190000000000000000000000000000000000000000000000006d0a3d530cf3fda2000000000000000000000000fd9a6cd1670fe8eb4012d8abb9cdf25741a6ff0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',

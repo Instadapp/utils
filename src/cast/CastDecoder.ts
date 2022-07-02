@@ -104,7 +104,7 @@ export class CastDecoder {
     return spells
   }
 
-  async getConnectorEventArgs (connectorName: string, eventName: string, eventParam: string, network: Network = 'mainnet') {
+  async getEventNamedArgs (connectorName: string, eventName: string, eventParam: string, network: Network = 'mainnet') {
     const abi = await this.getConnectorAbi(connectorName, network)
 
     const connector = new Interface(abi.map(item => ({
