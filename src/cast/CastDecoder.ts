@@ -18,7 +18,7 @@ const DEFAULTS: ICastDecoderOptions = {
 }
 
 type AsyncReturnType<T extends (...args: any) => Promise<any>> =
-    T extends (...args: any) => Promise<infer R> ? R : any
+  T extends (...args: any) => Promise<infer R> ? R : any
 
 export class CastDecoder {
   options: ICastDecoderOptions
@@ -102,5 +102,28 @@ export class CastDecoder {
     }
 
     return spells
+  }
+
+  async getConnectorEventArgs (connectorName: string, eventName: string, eventParam: string, network: Network = 'mainnet') {
+    const abi = await this.getConnectorAbi(connectorName, network)
+
+    const connector = new Interface(abi.map(item => ({
+      ...item,
+      inputs: item.inputs
+        ? item.inputs.map(input => ({
+          ...input,
+          indexed: false
+        }))
+        : []
+    })))
+
+    const log = connector.decodeEventLog(eventName, eventParam)
+
+    return Object.keys(log).reduce((acc, key) => {
+      if (isNaN(Number(key))) {
+        acc[key] = String(log[key])
+      }
+      return acc
+    }, {})
   }
 }

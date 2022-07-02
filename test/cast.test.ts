@@ -163,4 +163,21 @@ describe('cast', () => {
 
     expect(decodedSpells[0].flashloanSpells).toBeDefined()
   })
+
+  test.only('can decode connector event', async () => {
+    const args = await castDecoder.getConnectorEventArgs(
+      'BASIC-A',
+      'LogWithdraw(address,uint256,address,uint256,uint256)',
+      '0x00000000000000000000000003ab458634910aad20ef5f1c8ee96f1d6ac549190000000000000000000000000000000000000000000000006d0a3d530cf3fda2000000000000000000000000fd9a6cd1670fe8eb4012d8abb9cdf25741a6ff0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+      'mainnet'
+    )
+
+    expect(args).toEqual({
+      getId: '0',
+      setId: '0',
+      tokenAmt: '7857159926810148258',
+      to: '0xFD9A6cD1670FE8eB4012d8ABb9Cdf25741A6Ff04',
+      erc20: '0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919'
+    })
+  })
 })
