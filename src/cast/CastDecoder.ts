@@ -1,10 +1,13 @@
 import { Interface, defaultAbiCoder } from '@ethersproject/abi'
+import { isAddress } from '@ethersproject/address'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { AbiFetcher } from '../abi'
 import { Network } from '../types'
 import { ICastDecoderOptions } from './types'
+const DSA_V1_CAST_ABI = ['function cast(address[] _targets, bytes[] _datas, address _origin)']
 const DSA_V2_CAST_ABI = ['function cast(string[] calldata _targetNames, bytes[] calldata _datas, address _origin)']
+const dsaV1Interface = new Interface(DSA_V1_CAST_ABI)
 const dsaV2Interface = new Interface(DSA_V2_CAST_ABI)
 const DEFAULTS: ICastDecoderOptions = {
   instaConnectorsAddresses: {
@@ -30,9 +33,11 @@ export class CastDecoder {
 
   getEncodedSpells (data: string) {
     try {
-      const tx = dsaV2Interface.parseTransaction({ data })
+      const isDsaV2 = data.startsWith('0x9304c934')
+      const tx = (isDsaV2 ? dsaV2Interface : dsaV1Interface).parseTransaction({ data })
+
       return {
-        targets: tx.args._targetNames,
+        targets: isDsaV2 ? tx.args._targetNames : tx.args._targets,
         spells: tx.args._datas
       }
     } catch (error) {
@@ -41,6 +46,10 @@ export class CastDecoder {
   }
 
   async getConnectorAbi (connectorName: string, network: Network = 'mainnet') {
+    if (isAddress(connectorName)) {
+      return await this.options.abiFetcher.get(connectorName, network)
+    }
+
     const instaConnectorsAddress = this.options.instaConnectorsAddresses[network]
 
     const contract = new Contract(instaConnectorsAddress, [
