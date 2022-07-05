@@ -42,6 +42,12 @@ export function retryOperation (
 }
 
 export class JsonRpcRetryProvider extends JsonRpcProvider {
+  constructor (url: string) {
+    super(url)
+
+    Object.setPrototypeOf(this, JsonRpcRetryProvider.prototype)
+  }
+
   public perform (method: string, params: any): Promise<any> {
     const timeouts = [5_000, 10_000]
     const operation = () => super.perform(method, params)
