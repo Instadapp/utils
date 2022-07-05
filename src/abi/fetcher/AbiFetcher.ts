@@ -1,11 +1,11 @@
 import { getAddress } from '@ethersproject/address'
-import { JsonRpcProvider } from '@ethersproject/providers'
 import { Contract } from '@ethersproject/contracts'
 import retry from 'async-retry'
 import axios from 'axios'
 import type { JsonFragment } from '@ethersproject/abi'
 import { IAbiFetcherOptions, ProxyFetchMode } from '../types'
 import { Network } from '../../types'
+import { JsonRpcRetryProvider } from '../../providers'
 
 const DEFAULTS: IAbiFetcherOptions = {
   retries: 3,
@@ -92,7 +92,7 @@ export class AbiFetcher {
     const originalAbi = await this._get(contractAddress, network)
 
     if (proxyFetchMode !== 'proxyOnly') {
-      const provider = new JsonRpcProvider(rpcProviderUrl[network])
+      const provider = new JsonRpcRetryProvider(rpcProviderUrl[network])
       let implementationAddress: string
       let implementationAbi: JsonFragment[] = []
 

@@ -1,6 +1,6 @@
 {
   "name": "@instadapp/utils",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "",
   "repository": "instadapp/utils",
   "license": "MIT",
@@ -31,11 +31,14 @@
     "@ethersproject/contracts": "^5.6.2",
     "@ethersproject/providers": "^5.6.8",
     "async-retry": "^1.3.3",
-    "axios": "^0.27.2"
+    "axios": "^0.27.2",
+    "bluebird": "^3.7.2",
+    "waait": "^1.0.5"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/async-retry": "^1.4.4",
+    "@types/bluebird": "^3.5.36",
     "@vitest/ui": "^0.16.0",
     "c8": "latest",
     "dotenv": "^16.0.1",

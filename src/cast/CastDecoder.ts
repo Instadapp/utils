@@ -1,8 +1,8 @@
 import { Interface, defaultAbiCoder } from '@ethersproject/abi'
 import { isAddress } from '@ethersproject/address'
 import { Contract } from '@ethersproject/contracts'
-import { JsonRpcProvider } from '@ethersproject/providers'
 import { AbiFetcher } from '../abi'
+import { JsonRpcRetryProvider } from '../providers'
 import { Network } from '../types'
 import { ICastDecoderOptions } from './types'
 const connectorsV1AddressToName = {
@@ -104,7 +104,7 @@ export class CastDecoder {
         stateMutability: 'view',
         type: 'function'
       }
-    ], new JsonRpcProvider(this.options.abiFetcher.options.rpcProviderUrl[network]))
+    ], new JsonRpcRetryProvider(this.options.abiFetcher.options.rpcProviderUrl[network]))
 
     const contractAddress = await contract.connectors(connectorName)
 
