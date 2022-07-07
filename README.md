@@ -136,6 +136,14 @@ import { wait } from '@instadapp/utils'
 await wait(300)
 ```
 
+### promiseTimeout
+
+```js
+import { promiseTimeout } from '@instadapp/utils'
+
+await promiseTimeout(300, promiseFn)
+```
+
 ### JsonRpcRetryProvider
 
 ```js
