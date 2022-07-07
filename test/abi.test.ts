@@ -25,7 +25,7 @@ const defaultAbiFetcher = new AbiFetcher({
   }
 })
 
-describe.skip('abi', () => {
+describe('abi', () => {
   test('can fetch abi', async () => {
     const abi = await defaultAbiFetcher.get('0x0000000000000000000000000000000000001010', 'polygon')
 

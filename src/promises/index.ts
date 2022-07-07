@@ -1,13 +1,23 @@
-import wait from 'waait'
-import Bluebird from 'bluebird'
-
 export interface RetryOptions {
   delay?: number;
   timeouts: number[];
 }
 
-export function promiseTimeout<T> (ms: number, promise: Promise<T>): Promise<T> {
-  return Bluebird.resolve(promise).timeout(ms)
+export async function promiseTimeout<T> (promise: Promise<T>, ms: number) {
+  let timer: any
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_resolve, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error('operation timed out'))
+        }, ms)
+      })
+    ])
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 export function retry (
@@ -26,7 +36,7 @@ export function retry (
     const timeout = timeouts[timeouts.length - retriesLeft]
 
     // Wrap the original operation in a timeout
-    const execution = promiseTimeout(timeout, operation())
+    const execution = promiseTimeout(operation(), timeout)
 
     // If the promise is successful, resolve it and bubble the result up
     return execution.then(resolve).catch((reason: any) => {
@@ -45,6 +55,6 @@ export function retry (
   })
 }
 
-export {
-  wait
+export function wait (amount: number = 0): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, amount))
 }
