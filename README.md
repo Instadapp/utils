@@ -116,6 +116,31 @@ await castDecoder.getSpell(
 );
 ```
 
+
+### retryOperation
+
+```js
+import { retry } from '@instadapp/utils'
+
+retry(() => asyncCall(), {
+  timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
+  delay: 300 // delay between retries in ms
+})
+```
+
+### JsonRpcRetryProvider
+
+```js
+import { JsonRpcRetryProvider } from '@instadapp/utils'
+
+const provider = new JsonRpcRetryProvider("https://rpc.ankr.io/eth");
+
+const providerWithCustomOptions = new JsonRpcRetryProvider("https://rpc.ankr.io/eth", {
+  timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
+  delay: 300 // delay between retries in ms
+})
+```
+
 ## 💻 Development
 
 - Clone this repository
