@@ -117,7 +117,7 @@ await castDecoder.getSpell(
 ```
 
 
-### retryOperation
+### retry
 
 ```js
 import { retry } from '@instadapp/utils'
