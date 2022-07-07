@@ -122,10 +122,18 @@ await castDecoder.getSpell(
 ```js
 import { retry } from '@instadapp/utils'
 
-retry(() => asyncCall(), {
+ retry(() => asyncCall(), {
   timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
   delay: 300 // delay between retries in ms
 })
+```
+
+### wait
+
+```js
+import { wait } from '@instadapp/utils'
+
+await wait(300)
 ```
 
 ### JsonRpcRetryProvider

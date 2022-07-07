@@ -15,12 +15,13 @@ export function retry (
   options: RetryOptions,
   retriesLeft?: number
 ) {
-  if (!retriesLeft) {
-    retriesLeft = options.timeouts.length
-  }
-
   return new Promise((resolve, reject) => {
     const { timeouts } = options
+
+    if (typeof retriesLeft === 'undefined' || retriesLeft === null) {
+      retriesLeft = timeouts.length
+    }
+
     // Find the timeout for this specific iteration
     const timeout = timeouts[timeouts.length - retriesLeft]
 
@@ -34,7 +35,7 @@ export function retry (
       if (retriesLeft - 1 > 0) {
         // Delay the new attempt slightly
         return wait(options.delay || 300)
-          .then(retry.bind(null, retriesLeft - 1, operation, options))
+          .then(retry.bind(null, operation, options, retriesLeft - 1))
           .then(resolve)
           .catch(reject)
       }
@@ -42,4 +43,8 @@ export function retry (
       return reject(reason)
     })
   })
+}
+
+export {
+  wait
 }
