@@ -88,7 +88,7 @@ export class CastDecoder {
     }
   }
 
-  async getConnectorAbi (connectorName: string, network: Network = 'mainnet', metadata?: Record<string, any>) {
+  async getConnectorAbi (connectorName: string, network: Network = 'mainnet', metadata?: Record<string, any> & { blockNumber?: number | string }) {
     if (isAddress(connectorName)) {
       return await this.options.abiFetcher.get(connectorName, network, this.options.abiFetcher.options.proxyFetchMode, metadata)
     }
@@ -106,12 +106,14 @@ export class CastDecoder {
       }
     ], new JsonRpcRetryProvider(this.options.abiFetcher.options.rpcProviderUrl[network]))
 
-    const contractAddress = await contract.connectors(connectorName)
+    const contractAddress = await contract.connectors(connectorName, {
+      blockTag: metadata && metadata.blockNumber ? metadata.blockNumber : 'latest'
+    })
 
     return await this.options.abiFetcher.get(contractAddress, network, this.options.abiFetcher.options.proxyFetchMode, metadata)
   }
 
-  async getSpell (connectorName: string, data: string, network: Network = 'mainnet', metadata?: Record<string, any>) {
+  async getSpell (connectorName: string, data: string, network: Network = 'mainnet', metadata?: Record<string, any> & { blockNumber?: number | string }) {
     const spell = {
       connector: isAddress(connectorName) ? (connectorsV1AddressToName[connectorName.toLowerCase()] || connectorName) : connectorName,
       data,
@@ -163,7 +165,7 @@ export class CastDecoder {
     return spells
   }
 
-  async getEventNamedArgs (connectorName: string, eventName: string, eventParam: string, network: Network = 'mainnet', metadata?: Record<string, any>) {
+  async getEventNamedArgs (connectorName: string, eventName: string, eventParam: string, network: Network = 'mainnet', metadata?: Record<string, any> & { blockNumber?: number | string }) {
     const abi = await this.getConnectorAbi(connectorName, network, metadata)
 
     const connector = new Interface(abi.map(item => ({

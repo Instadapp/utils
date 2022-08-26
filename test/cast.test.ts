@@ -207,4 +207,26 @@ describe('cast', () => {
 
     expect(spells).toEqual([expectedDecodedSpell])
   })
+
+  test('get spells at a given block', async () => {
+    const abi1 = await castDecoder.getConnectorAbi(
+      'EULER-A',
+      'mainnet',
+      {
+        blockNumber: 15326656
+      }
+    )
+
+    expect(abi1.length).equal(27)
+
+    const abi2 = await castDecoder.getConnectorAbi(
+      'EULER-A',
+      'mainnet',
+      {
+        blockNumber: 15416934
+      }
+    )
+
+    expect(abi2.length).equal(25)
+  })
 })
