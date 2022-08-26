@@ -39,7 +39,7 @@ export class AbiFetcher {
     this.options = Object.assign({}, DEFAULTS, options)
   }
 
-  private async _get (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+  private async _get (contractAddress: string, network: Network, metadata?: Record<string, any>): Promise<JsonFragment[]> {
     const { cache, retries, networkToEtherscanAPI, etherscanApiKey } = this.options
 
     try {
@@ -51,7 +51,7 @@ export class AbiFetcher {
     const cacheKey = `${network}:${contractAddress}`
 
     if (cache) {
-      const abi = await cache.get(cacheKey)
+      const abi = await cache.get(cacheKey, metadata)
 
       if (abi) {
         return abi
@@ -86,10 +86,10 @@ export class AbiFetcher {
     }
   }
 
-  async get (contractAddress: string, network: Network, proxyFetchMode?: ProxyFetchMode): Promise<JsonFragment[]> {
+  async get (contractAddress: string, network: Network, proxyFetchMode?: ProxyFetchMode, metadata?: Record<string, any>): Promise<JsonFragment[]> {
     const { rpcProviderUrl, implementationStorageLocations, proxyFetchMode: defaulProxyFetchMode } = this.options
     proxyFetchMode = proxyFetchMode || defaulProxyFetchMode
-    const originalAbi = await this._get(contractAddress, network)
+    const originalAbi = await this._get(contractAddress, network, metadata)
 
     if (proxyFetchMode !== 'proxyOnly') {
       const provider = new JsonRpcRetryProvider(rpcProviderUrl[network])
@@ -119,7 +119,7 @@ export class AbiFetcher {
         }
 
         if (implementationAddress) {
-          implementationAbi = await this._get(implementationAddress, network)
+          implementationAbi = await this._get(implementationAddress, network, metadata)
           return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
         } else if (proxyFetchMode === 'implementationOnly') {
           throw new Error(`Couldn't fetch ImplementationOnly ABI for ${contractAddress}`)
@@ -130,7 +130,7 @@ export class AbiFetcher {
         const contract = new Contract(contractAddress, originalAbi, provider)
 
         implementationAddress = await contract.getDummyImplementation()
-        implementationAbi = await this._get(implementationAddress, network)
+        implementationAbi = await this._get(implementationAddress, network, metadata)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
       }
     }

@@ -88,9 +88,9 @@ export class CastDecoder {
     }
   }
 
-  async getConnectorAbi (connectorName: string, network: Network = 'mainnet') {
+  async getConnectorAbi (connectorName: string, network: Network = 'mainnet', metadata?: Record<string, any>) {
     if (isAddress(connectorName)) {
-      return await this.options.abiFetcher.get(connectorName, network)
+      return await this.options.abiFetcher.get(connectorName, network, this.options.abiFetcher.options.proxyFetchMode, metadata)
     }
 
     const instaConnectorsAddress = this.options.instaConnectorsAddresses[network]
@@ -108,10 +108,10 @@ export class CastDecoder {
 
     const contractAddress = await contract.connectors(connectorName)
 
-    return await this.options.abiFetcher.get(contractAddress, network)
+    return await this.options.abiFetcher.get(contractAddress, network, this.options.abiFetcher.options.proxyFetchMode, metadata)
   }
 
-  async getSpell (connectorName: string, data: string, network: Network = 'mainnet') {
+  async getSpell (connectorName: string, data: string, network: Network = 'mainnet', metadata?: Record<string, any>) {
     const spell = {
       connector: isAddress(connectorName) ? (connectorsV1AddressToName[connectorName.toLowerCase()] || connectorName) : connectorName,
       data,
@@ -121,7 +121,7 @@ export class CastDecoder {
       flashloanSpells: undefined
     }
 
-    const abi = await this.getConnectorAbi(connectorName, network)
+    const abi = await this.getConnectorAbi(connectorName, network, metadata)
 
     const connector = new Interface(abi)
 
@@ -142,7 +142,7 @@ export class CastDecoder {
         spell.flashloanSpells = await this.getSpells({
           targets,
           spells
-        }, network)
+        }, network, metadata)
       }
     } catch (error) {
     }
@@ -150,12 +150,12 @@ export class CastDecoder {
     return spell
   }
 
-  async getSpells (data: string | { targets: string[], spells: string[] }, network: Network = 'mainnet') {
+  async getSpells (data: string | { targets: string[], spells: string[] }, network: Network = 'mainnet', metadata?: Record<string, any>) {
     const encodedSpells = typeof data === 'string' ? this.getEncodedSpells(data) : data
 
     const spells: AsyncReturnType<typeof this.getSpell>[] = []
     for (let index = 0; index < encodedSpells.targets.length; index++) {
-      const spell = await this.getSpell(encodedSpells.targets[index], encodedSpells.spells[index], network)
+      const spell = await this.getSpell(encodedSpells.targets[index], encodedSpells.spells[index], network, metadata)
 
       spells.push(spell)
     }
@@ -163,8 +163,8 @@ export class CastDecoder {
     return spells
   }
 
-  async getEventNamedArgs (connectorName: string, eventName: string, eventParam: string, network: Network = 'mainnet') {
-    const abi = await this.getConnectorAbi(connectorName, network)
+  async getEventNamedArgs (connectorName: string, eventName: string, eventParam: string, network: Network = 'mainnet', metadata?: Record<string, any>) {
+    const abi = await this.getConnectorAbi(connectorName, network, metadata)
 
     const connector = new Interface(abi.map(item => ({
       ...item,
