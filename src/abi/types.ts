@@ -6,8 +6,8 @@ export type AbiType = 'function' | 'constructor' | 'event' | 'fallback';
 export type StateMutabilityType = 'pure' | 'view' | 'nonpayable' | 'payable';
 
 export interface ICache {
-    get(key: string, metadata?: Record<string, any>): PromiseLike<JsonFragment[]> | JsonFragment[] | undefined;
-    set(key: string, value: JsonFragment[], metadata?: Record<string, any>): PromiseLike<any> | any
+    get(key: string, network: Network | string, metadata?: Record<string, any>): PromiseLike<JsonFragment[]> | JsonFragment[] | undefined;
+    set(key: string, value: JsonFragment[], network: Network | string, metadata?: Record<string, any>): PromiseLike<any> | any
 }
 
 export interface IAbiFetcherOptions {
