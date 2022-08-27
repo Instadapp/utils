@@ -51,10 +51,14 @@ export class AbiFetcher {
     const cacheKey = `${network}:${contractAddress}`
 
     if (cache) {
-      const abi = await cache.get(cacheKey, network, metadata)
+      try {
+        const abi = await cache.get(cacheKey, network, metadata)
 
-      if (abi) {
-        return abi
+        if (abi) {
+          return abi
+        }
+      } catch (error) {
+
       }
     }
 
@@ -77,7 +81,11 @@ export class AbiFetcher {
           retries
         })
       if (cache) {
-        await cache.set(`${network}:${contractAddress}`, abi, network, metadata)
+        try {
+          await cache.set(`${network}:${contractAddress}`, abi, network, metadata)
+        } catch (error) {
+
+        }
       }
 
       return abi
