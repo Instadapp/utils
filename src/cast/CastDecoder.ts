@@ -130,10 +130,17 @@ export class CastDecoder {
     const tx = connector.parseTransaction({ data: spell.data })
 
     spell.method = tx.name
-    spell.args = [...tx.args].map(String)
+    spell.args = [...tx.args].map((arg) => {
+      if (Array.isArray(arg)) {
+        return arg.map(String)
+      }
+
+      return String(arg)
+    })
     spell.namedArgs = Object.keys({ ...tx.args }).reduce((acc, key) => {
       if (isNaN(Number(key))) {
-        acc[key] = String(tx.args[key])
+        const arg = tx.args[key]
+        acc[key] = Array.isArray(arg) ? arg.map(String) : String(arg)
       }
       return acc
     }, {})
