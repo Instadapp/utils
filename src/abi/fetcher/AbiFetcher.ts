@@ -140,6 +140,12 @@ export class AbiFetcher {
         implementationAddress = await contract.getDummyImplementation()
         implementationAbi = await this._get(implementationAddress, network, metadata)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+      } else if (originalAbi.some(item => item.type === 'function' && item.name === 'comptrollerImplementation')) {
+        const contract = new Contract(contractAddress, originalAbi, provider)
+
+        implementationAddress = await contract.comptrollerImplementation()
+        implementationAbi = await this._get(implementationAddress, network, metadata)
+        return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
       }
     }
 

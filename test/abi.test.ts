@@ -105,4 +105,22 @@ describe('abi', () => {
   test('throw exception on EOA', async () => {
     await expect(defaultAbiFetcher.get('0xA7366d1aE09e6fD6Cb43CFa39A2D5E43f120222c', 'polygon')).rejects.toThrowError()
   })
+
+  test('can fetch compound v2 proxy implementation', async () => {
+    const abi = await defaultAbiFetcher.get('0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B', 'mainnet', 'implementationOnly')
+
+    expect(abi).to.deep.include({
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: 'contract CToken',
+          name: 'cToken',
+          type: 'address'
+        }
+      ],
+      name: 'MarketListed',
+      type: 'event'
+    })
+  })
 })
