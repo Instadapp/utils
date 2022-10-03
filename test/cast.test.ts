@@ -36,7 +36,7 @@ beforeAll(async () => {
   await dsa.setInstance(21723)
 })
 
-describe('cast', () => {
+describe.concurrent('cast', () => {
   test('can get encoded spells from encoded data', () => {
     const spells = dsa.Spell()
 

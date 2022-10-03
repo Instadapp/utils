@@ -1,7 +1,7 @@
 import { expect, describe, test } from 'vitest'
 import { retry, wait } from '../src'
 
-describe('promises', () => {
+describe.concurrent('promises', () => {
   test('retry', async () => {
     let called = 0
     async function testfn () {

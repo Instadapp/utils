@@ -45,7 +45,7 @@
     "standard-version": "latest",
     "typescript": "latest",
     "unbuild": "latest",
-    "vitest": "0.17.1",
+    "vitest": "^0.23.4",
     "web3": "^1.7.4"
   }
 }
