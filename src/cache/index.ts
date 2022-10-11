@@ -49,6 +49,10 @@ export class Cache {
     await this.driver.set(key, await valueFn(), seconds)
   }
 
+  static async set<T extends any> (key: string, value: T | (() => Promise<T> | T), seconds?: number) {
+    await this.put(key, value, seconds)
+  }
+
   static async forget (key: string) {
     await this.driver.forget(key).catch(() => { })
   }
