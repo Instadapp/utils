@@ -171,6 +171,7 @@ Cache.extend("mongodb", {
   async flush() {},
 });
 
+// Note: you should set this once per life cycle
 Cache.setDefault("mongodb"); // default is `memory` https://github.com/Instadapp/utils/tree/master/src/cache/drivers/index.ts
 
 await Cache.get("key1");
@@ -194,6 +195,9 @@ await Cache.flush();
 const users = await Cache.remember("users", seconds, async () => {
   return await User.find();
 });
+
+await Cache.store("memory").get("users:1"); // safe way to switch driver for a moment
+
 ```
 
 ## 💻 Development
