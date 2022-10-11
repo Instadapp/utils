@@ -116,45 +116,84 @@ await castDecoder.getSpell(
 );
 ```
 
-
 ### retry
 
 ```js
-import { retry } from '@instadapp/utils'
+import { retry } from "@instadapp/utils";
 
- retry(() => asyncCall(), {
+retry(() => asyncCall(), {
   timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
-  delay: 300 // delay between retries in ms
-})
+  delay: 300, // delay between retries in ms
+});
 ```
 
 ### wait
 
 ```js
-import { wait } from '@instadapp/utils'
+import { wait } from "@instadapp/utils";
 
-await wait(300)
+await wait(300);
 ```
 
 ### promiseTimeout
 
 ```js
-import { promiseTimeout } from '@instadapp/utils'
+import { promiseTimeout } from "@instadapp/utils";
 
-await promiseTimeout(promiseFn, 10_000)
+await promiseTimeout(promiseFn, 10_000);
 ```
 
 ### JsonRpcRetryProvider
 
 ```js
-import { JsonRpcRetryProvider } from '@instadapp/utils'
+import { JsonRpcRetryProvider } from "@instadapp/utils";
 
 const provider = new JsonRpcRetryProvider("https://rpc.ankr.io/eth");
 
-const providerWithCustomOptions = new JsonRpcRetryProvider("https://rpc.ankr.io/eth", {
-  timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
-  delay: 300 // delay between retries in ms
-})
+const providerWithCustomOptions = new JsonRpcRetryProvider(
+  "https://rpc.ankr.io/eth",
+  {
+    timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
+    delay: 300, // delay between retries in ms
+  }
+);
+```
+
+### Cache
+
+```ts
+import { Cache, ICacheDriver } from "@instadapp/utils";
+
+Cache.extend("mongodb", {
+  async get(key: string) {},
+  async set(key: string, value: any, seconds?: number) {},
+  async forget(key: string) {},
+  async flush() {},
+});
+
+Cache.setDefault("mongodb"); // default is `memory` https://github.com/Instadapp/utils/tree/master/src/cache/drivers/index.ts
+
+await Cache.get("key1");
+await Cache.get("key1", "default");
+await Cache.get("key1", async () => "default");
+
+await Cache.put("key2");
+await Cache.put("key2", "default");
+await Cache.put("key2", async () => "default");
+
+const seconds = 42;
+
+await Cache.put("key2", seconds);
+await Cache.put("key2", "default", seconds);
+await Cache.put("key2", async () => "default", seconds);
+
+await Cache.pull("key3"); // get and forget
+await Cache.forget("key1");
+await Cache.flush();
+
+const users = await Cache.remember("users", seconds, async () => {
+  return await User.find();
+});
 ```
 
 ## 💻 Development

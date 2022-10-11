@@ -1,0 +1,67 @@
+import { expect, describe, test, vi } from 'vitest'
+import { Cache, wait } from '../src'
+
+describe('cache', () => {
+  test('custom driver', async () => {
+    const cacheSet = vi.fn()
+    const cacheFlush = vi.fn()
+    const cacheForget = vi.fn()
+
+    Cache.extend('testing-1', {
+      get (_key) {
+        return Promise.resolve(123 as any)
+      },
+      async set (_key, _value, _seconds) {
+        await cacheSet(...arguments)
+      },
+      async forget (_key) {
+        await cacheForget(...arguments)
+      },
+      async flush () {
+        await cacheFlush(...arguments)
+      }
+    })
+
+    Cache.setDefault('testing-1')
+
+    await Cache.put('a', 69, 420)
+
+    expect(await Cache.get('a')).toBe(123)
+
+    await Cache.forget('z')
+    await Cache.flush()
+
+    expect(cacheSet).toBeCalledWith('a', 69, 420)
+    expect(cacheForget).toBeCalledWith('z')
+    expect(cacheFlush).toBeCalled()
+  })
+
+  test('memory', async () => {
+    Cache.setDefault('memory')
+
+    await Cache.put('a', 123)
+
+    expect(await Cache.get('a')).toBe(123)
+
+    await Cache.put('b', 42, 1)
+
+    expect(await Cache.get('b')).toBe(42)
+
+    await wait(1000)
+
+    expect(await Cache.get('b')).toBe(null)
+  })
+
+  test('remember', async () => {
+    Cache.setDefault('memory')
+
+    const rememberValueFn = vi.fn(() => 123)
+
+    await Cache.remember('remember', 1, rememberValueFn)
+    await Cache.remember('remember', 1, rememberValueFn)
+    await Cache.remember('remember', 1, rememberValueFn)
+
+    expect(rememberValueFn).toBeCalledTimes(1)
+    expect(rememberValueFn).toReturnWith(123)
+  })
+})
