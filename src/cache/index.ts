@@ -21,6 +21,18 @@ export class Cache {
     this.registeredDrivers[name] = cacheDriver
   }
 
+  static store (name: string) {
+    return new Proxy(Cache, {
+      get (target, p, receiver) {
+        if (p === 'driver') {
+          return target.registeredDrivers[name]
+        }
+
+        return Reflect.get(target, p, receiver)
+      }
+    })
+  }
+
   static get driver () {
     const driver = this.registeredDrivers[this.defaultDriver]
 

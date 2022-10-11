@@ -64,4 +64,33 @@ describe('cache', () => {
     expect(rememberValueFn).toBeCalledTimes(1)
     expect(rememberValueFn).toReturnWith(123)
   })
+
+  test('store', async () => {
+    const rememberValueFn = vi.fn()
+
+    Cache.extend('store', {
+      async get (_key: string) {
+        await rememberValueFn()
+      },
+      async set (_key, _value, _seconds) {
+      },
+      async forget (_key) {
+      },
+      async flush () {
+      }
+    })
+
+    Cache.setDefault('memory')
+
+    await Cache.store('store').remember('remember', 1, 123)
+    await Cache.store('store').remember('remember', 1, 123)
+    await Cache.store('store').remember('remember', 1, 123)
+
+    expect(Cache.defaultDriver).toBe('memory')
+    expect(rememberValueFn).toBeCalledTimes(3)
+
+    await Cache.set('test', 69)
+
+    expect(await Cache.get('test')).toBe(69)
+  })
 })
