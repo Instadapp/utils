@@ -206,6 +206,7 @@ import { toJsonRpcProvider } from "@instadapp/utils";
 import { ethers } from "ethers";
 
 let provider = toJsonRpcProvider(window.ethereum) // Metamask, Rabby, ...
+let provider = toJsonRpcProvider(web3)// Web3.js instance, `web3.currentProvider` will be used internally
 let provider = toJsonRpcProvider(web3.currentProvider)// Web3.js provider, ex:  Metamask, Rabby, WalletConnect, ...
 let provider = toJsonRpcProvider("https://rpc.ankr.com/eth") // Http RPC URL
 let provider = toJsonRpcProvider(new ethers.providers.JsonRpcProvider('https://rpc.ankr.com/eth')) // ethers JsonRpcProvider instance
