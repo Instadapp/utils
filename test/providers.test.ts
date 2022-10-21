@@ -9,7 +9,7 @@ describe.concurrent('providers', () => {
     expect(typeof await provider.getBlockNumber()).toBe('number')
   })
 
-  test('JonRpcProvider', async () => {
+  test('JsonRpcProvider', async () => {
     const provider = toJsonRpcProvider(
       new JsonRpcProvider('https://rpc.ankr.com/eth')
     )
