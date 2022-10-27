@@ -20,12 +20,12 @@ export async function promiseTimeout<T> (promise: Promise<T>, ms: number) {
   }
 }
 
-export function retry (
-  operation: () => Promise<any>,
+export function retry<T = any> (
+  operation: () => Promise<T>,
   options: RetryOptions,
   retriesLeft?: number
 ) {
-  return new Promise((resolve, reject) => {
+  return new Promise<T>((resolve, reject) => {
     const { timeouts } = options
 
     if (typeof retriesLeft === 'undefined' || retriesLeft === null) {
@@ -46,7 +46,7 @@ export function retry (
         // Delay the new attempt slightly
         return wait(options.delay || 300)
           .then(retry.bind(null, operation, options, retriesLeft - 1))
-          .then(resolve)
+          .then((value: any) => resolve(value))
           .catch(reject)
       }
       // Reject (and bubble the result up) if there are no more retries
