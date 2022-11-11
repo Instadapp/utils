@@ -200,7 +200,7 @@ await Cache.put("key2", async () => "default");
 
 const seconds = 42;
 
-await Cache.put("key2", seconds);
+await Cache.put("key2", "default");
 await Cache.put("key2", "default", seconds);
 await Cache.put("key2", async () => "default", seconds);
 
