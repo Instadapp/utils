@@ -159,6 +159,22 @@ const providerWithCustomOptions = new JsonRpcRetryProvider(
 );
 ```
 
+### StaticJsonRpcRetryProvider
+
+```js
+import { StaticJsonRpcRetryProvider } from "@instadapp/utils";
+
+const provider = new StaticJsonRpcRetryProvider("https://rpc.ankr.io/eth");
+
+const providerWithCustomOptions = new StaticJsonRpcRetryProvider(
+  "https://rpc.ankr.io/eth",
+  {
+    timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
+    delay: 300, // delay between retries in ms
+  }
+);
+```
+
 ### Cache
 
 ```ts
