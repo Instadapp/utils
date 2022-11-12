@@ -9,7 +9,7 @@ export async function promiseTimeout<T> (promise: Promise<T>, ms: number) {
   try {
     return await Promise.race([
       promise,
-      new Promise((_resolve, reject) => {
+      new Promise<T>((_resolve, reject) => {
         timer = setTimeout(() => {
           reject(new Error('operation timed out'))
         }, ms)
