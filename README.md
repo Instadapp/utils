@@ -16,7 +16,7 @@ Install package:
 npm install @instadapp/utils
 
 # yarn
-yarn install @instadapp/utils
+yarn add @instadapp/utils
 
 # pnpm
 pnpm install @instadapp/utils
