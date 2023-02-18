@@ -1,1 +1,1 @@
-export type Network = 'polygon' | 'mainnet' | 'fantom' | 'arbitrum' | 'avalanche' | 'optimism';
+export type Network = 'polygon' | 'mainnet' | 'fantom' | 'arbitrum' | 'avalanche' | 'optimism' | 'bsc' | 'gnosis' | string;

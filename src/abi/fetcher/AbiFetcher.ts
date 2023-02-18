@@ -20,7 +20,9 @@ const DEFAULTS: IAbiFetcherOptions = {
     avalanche: 'https://rpc.ankr.com/avalanche',
     optimism: 'https://rpc.ankr.com/optimism',
     arbitrum: 'https://rpc.ankr.com/arbitrum',
-    fantom: 'https://rpc.ankr.com/fantom'
+    fantom: 'https://rpc.ankr.com/fantom',
+    bsc: 'https://rpc.ankr.com/bsc',
+    gnosis: 'https://rpc.ankr.com/gnosis'
   },
   networkToEtherscanAPI: {
     polygon: 'https://api.polygonscan.com/api',
@@ -28,7 +30,9 @@ const DEFAULTS: IAbiFetcherOptions = {
     avalanche: 'https://api.snowtrace.io/api',
     optimism: 'https://api-optimistic.etherscan.io/api',
     arbitrum: 'https://api.arbiscan.io/api',
-    fantom: 'https://api.ftmscan.com/api'
+    fantom: 'https://api.ftmscan.com/api',
+    bsc: 'https://api.bscscan.com/api',
+    gnosis: 'https://api.gnosisscan.io/api'
   }
 }
 
@@ -107,7 +111,7 @@ export class AbiFetcher {
       if (originalAbi.some(item => item.type === 'function' && item.name === 'implementation')) {
         // EIP-897 DelegateProxy
         if (originalAbi.some(item => item.type === 'function' && item.name === 'proxyType')) {
-          const contract = new Contract(contractAddress, originalAbi, provider)
+          const contract = new Contract(contractAddress, originalAbi, provider as any)
           implementationAddress = await contract.implementation()
         } else { //  EIP-1967: Standard Proxy Storage Slots
           for (const implementationStorageLocation of implementationStorageLocations) {
@@ -135,19 +139,19 @@ export class AbiFetcher {
           return originalAbi
         }
       } else if (originalAbi.some(item => item.type === 'function' && item.name === 'getDummyImplementation')) {
-        const contract = new Contract(contractAddress, originalAbi, provider)
+        const contract = new Contract(contractAddress, originalAbi, provider as any)
 
         implementationAddress = await contract.getDummyImplementation()
         implementationAbi = await this._get(implementationAddress, network, metadata)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
       } else if (originalAbi.some(item => item.type === 'function' && item.name === 'implementations')) {
-        const contract = new Contract(contractAddress, originalAbi, provider)
+        const contract = new Contract(contractAddress, originalAbi, provider as any)
 
         implementationAddress = await contract.implementations()
         implementationAbi = await this._get(implementationAddress, network, metadata)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
       } else if (originalAbi.some(item => item.type === 'function' && item.name === 'comptrollerImplementation')) {
-        const contract = new Contract(contractAddress, originalAbi, provider)
+        const contract = new Contract(contractAddress, originalAbi, provider as any)
 
         implementationAddress = await contract.comptrollerImplementation()
         implementationAbi = await this._get(implementationAddress, network, metadata)
