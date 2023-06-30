@@ -43,7 +43,7 @@ export class AbiFetcher {
     this.options = Object.assign({}, DEFAULTS, options)
   }
 
-  private async _get (contractAddress: string, network: Network, metadata?: Record<string, any>): Promise<JsonFragment[]> {
+  private async _get (contractAddress: string, network: Network, metadata?: Record<string, any>, options?: { retries? : number}): Promise<JsonFragment[]> {
     const { cache, retries, networkToEtherscanAPI, etherscanApiKey } = this.options
 
     try {
@@ -82,7 +82,7 @@ export class AbiFetcher {
             )
             .then(({ data }) => JSON.parse(data.result)),
         {
-          retries
+          retries: options?.retries ?? retries
         })
       if (cache) {
         try {
@@ -156,6 +156,20 @@ export class AbiFetcher {
         implementationAddress = await contract.comptrollerImplementation()
         implementationAbi = await this._get(implementationAddress, network, metadata)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+      } else {
+        try {
+          implementationAddress = await provider.getStorageAt(contractAddress, '0x0')
+          implementationAddress = getAddress(`0x${implementationAddress.slice(-40)}`)
+          implementationAbi = await this._get(implementationAddress, network, metadata, {
+            retries: 0
+          })
+
+          console.log(implementationAddress)
+
+          return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+        } catch (error) {
+          // fallback to original abi
+        }
       }
     }
 
