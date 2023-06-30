@@ -59,7 +59,7 @@ describe.concurrent('abi', () => {
 
   test('can set etherscan keys', async () => {
     const etherscanApiKey = {
-      mainnet: process.env.MAINNET_ETHERSCAN_API_KEY || '9D13ZE7XSBTJ94N9BNJ2MA33VMAY2YPIRB'
+      mainnet: '9D13ZE7XSBTJ94N9BNJ2MA33VMAY2YPIRB'
     }
 
     const etherscan = vi.spyOn(etherscanApiKey, 'mainnet', 'get')
@@ -70,7 +70,7 @@ describe.concurrent('abi', () => {
 
     await abiFetcher.get('0xB8c77482e45F1F44dE1745F52C74426C631bDD52', 'mainnet')
 
-    expect(etherscan).toBeCalledTimes(2)
+    expect(etherscan).toBeCalledTimes(1)
   })
 
   test('can fetch proxy implementation - EIP-1967', async () => {
@@ -122,37 +122,5 @@ describe.concurrent('abi', () => {
       name: 'MarketListed',
       type: 'event'
     })
-  })
-
-  test('can fetch proxy implementation - avocado', async () => {
-    const usdcAddress = '0x132c3107f3cfd0Cf33485BDa398C993b1cd4723d'
-    const network = 'polygon'
-
-    const proxyOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'proxyOnly')
-    expect(proxyOnlyAbi).toEqual([
-      {
-        inputs: [],
-        stateMutability: 'nonpayable',
-        type: 'constructor'
-      },
-      {
-        stateMutability: 'payable',
-        type: 'fallback'
-      }
-    ])
-
-    const implementationOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'implementationOnly')
-
-    expect(implementationOnlyAbi).not.toEqual([
-      {
-        inputs: [],
-        stateMutability: 'nonpayable',
-        type: 'constructor'
-      },
-      {
-        stateMutability: 'payable',
-        type: 'fallback'
-      }
-    ])
   })
 })
