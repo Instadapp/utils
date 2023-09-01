@@ -15,14 +15,16 @@ const DEFAULTS: IAbiFetcherOptions = {
   ],
   proxyFetchMode: 'proxyAndImplementation',
   rpcProviderUrl: {
-    polygon: 'https://rpc.ankr.com/polygon',
-    mainnet: 'https://rpc.ankr.com/eth',
-    avalanche: 'https://rpc.ankr.com/avalanche',
-    optimism: 'https://rpc.ankr.com/optimism',
-    arbitrum: 'https://rpc.ankr.com/arbitrum',
-    fantom: 'https://rpc.ankr.com/fantom',
-    bsc: 'https://rpc.ankr.com/bsc',
-    gnosis: 'https://rpc.ankr.com/gnosis'
+    polygon: 'https://polygon-rpc.com',
+    mainnet: 'https://eth.drpc.org',
+    avalanche: 'https://api.avax.network/ext/bc/C/rpc',
+    optimism: 'https://mainnet.optimism.io',
+    arbitrum: 'https://arb1.arbitrum.io/rpc',
+    fantom: 'https://rpc.ftm.tools',
+    bsc: 'https://bsc-dataseed.binance.org',
+    gnosis: 'https://rpc.gnosischain.com',
+    'polygon-zkevm': 'https://zkevm-rpc.com',
+    base: 'https://developer-access-mainnet.base.org'
   },
   networkToEtherscanAPI: {
     polygon: 'https://api.polygonscan.com/api',
@@ -32,7 +34,9 @@ const DEFAULTS: IAbiFetcherOptions = {
     arbitrum: 'https://api.arbiscan.io/api',
     fantom: 'https://api.ftmscan.com/api',
     bsc: 'https://api.bscscan.com/api',
-    gnosis: 'https://api.gnosisscan.io/api'
+    gnosis: 'https://api.gnosisscan.io/api',
+    'polygon-zkevm': 'https://api.zkevm.polygonscan.com/api',
+    base: 'https://api.basescan.org/api'
   }
 }
 
