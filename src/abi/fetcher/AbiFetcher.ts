@@ -35,7 +35,7 @@ const DEFAULTS: IAbiFetcherOptions = {
     fantom: 'https://api.ftmscan.com/api',
     bsc: 'https://api.bscscan.com/api',
     gnosis: 'https://api.gnosisscan.io/api',
-    'polygon-zkevm': 'https://api.zkevm.polygonscan.com/api',
+    'polygon-zkevm': 'https://api-zkevm.polygonscan.com/api',
     base: 'https://api.basescan.org/api'
   }
 }
