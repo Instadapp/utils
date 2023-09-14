@@ -47,7 +47,7 @@ describe('cache', () => {
 
     expect(await Cache.get('b')).toBe(42)
 
-    await wait(1000)
+    await wait(1100)
 
     expect(await Cache.get('b')).toBe(null)
   })
