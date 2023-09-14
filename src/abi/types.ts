@@ -50,6 +50,14 @@ export interface IAbiFetcherOptions {
      */
     networkToEtherscanAPI: Partial<Record<Network, string>>,
     /**
+     *  @default
+      {
+            aurora: 'https://explorer.aurora.dev/graphiql',
+            fuse: 'https://explorer.fuse.io/graphiql',
+        }
+     */
+    networkToBlockscoutAPI: Partial<Record<Network, string>>,
+    /**
      *  @default proxyAndImplementation
      */
     proxyFetchMode: ProxyFetchMode

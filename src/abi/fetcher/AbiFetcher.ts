@@ -37,6 +37,10 @@ const DEFAULTS: IAbiFetcherOptions = {
     gnosis: 'https://api.gnosisscan.io/api',
     'polygon-zkevm': 'https://api-zkevm.polygonscan.com/api',
     base: 'https://api.basescan.org/api'
+  },
+  networkToBlockscoutAPI: {
+    aurora: 'https://explorer.aurora.dev/graphiql',
+    fuse: 'https://explorer.fuse.io/graphiql'
   }
 }
 
@@ -47,8 +51,70 @@ export class AbiFetcher {
     this.options = Object.assign({}, DEFAULTS, options)
   }
 
+  private async fetchABI (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+    const { networkToEtherscanAPI, networkToBlockscoutAPI } = this.options
+
+    if (networkToEtherscanAPI[network]) {
+      return await this.fetchABIFromEtherscan(contractAddress, network)
+    }
+
+    if (networkToBlockscoutAPI[network]) {
+      return await this.fetchABIFromBlockscout(contractAddress, network)
+    }
+
+    throw new Error(`Couldn't fetch ABI for ${contractAddress}`)
+  }
+
+  private async fetchABIFromEtherscan (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+    const { retries, networkToEtherscanAPI, etherscanApiKey } = this.options
+
+    return await retry(
+      async () =>
+        await axios
+          .get(
+            networkToEtherscanAPI[network], {
+              params: {
+                module: 'contract',
+                action: 'getabi',
+                address: contractAddress,
+                apikey: etherscanApiKey ? etherscanApiKey[network] : undefined
+              }
+            }
+          )
+          .then(({ data }) => JSON.parse(data.result)),
+      {
+        retries
+      })
+  }
+
+  private async fetchABIFromBlockscout (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+    const { retries, networkToBlockscoutAPI } = this.options
+
+    return await retry(
+      async () =>
+        await axios
+          .post(
+            networkToBlockscoutAPI[network],
+            {
+              query: `{\n  address(hash:"${contractAddress}") {\n    \tsmartContract {\n        abi\n      }\n  }\t\n}`,
+              variables: null,
+              operationName: null
+            }
+          )
+          .then(({ data: { data } }) => {
+            if (data.errors) {
+              throw new Error(data.errors[0].message)
+            }
+
+            return JSON.parse(data.address.smartContract.abi)
+          }),
+      {
+        retries
+      })
+  }
+
   private async _get (contractAddress: string, network: Network, metadata?: Record<string, any>): Promise<JsonFragment[]> {
-    const { cache, retries, networkToEtherscanAPI, etherscanApiKey } = this.options
+    const { cache } = this.options
 
     try {
       getAddress(contractAddress)
@@ -71,23 +137,7 @@ export class AbiFetcher {
     }
 
     try {
-      const abi = await retry(
-        async () =>
-          await axios
-            .get(
-              networkToEtherscanAPI[network], {
-                params: {
-                  module: 'contract',
-                  action: 'getabi',
-                  address: contractAddress,
-                  apikey: etherscanApiKey ? etherscanApiKey[network] : undefined
-                }
-              }
-            )
-            .then(({ data }) => JSON.parse(data.result)),
-        {
-          retries
-        })
+      const abi = await this.fetchABI(contractAddress, network)
       if (cache) {
         try {
           await cache.set(`${network}:${contractAddress}`, abi, network, metadata)
