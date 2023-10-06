@@ -24,7 +24,8 @@ const DEFAULTS: IAbiFetcherOptions = {
     bsc: 'https://bsc-dataseed.binance.org',
     gnosis: 'https://rpc.gnosischain.com',
     'polygon-zkevm': 'https://zkevm-rpc.com',
-    base: 'https://mainnet.base.org'
+    base: 'https://mainnet.base.org',
+    fuse: 'https://rpc.fuse.io'
   },
   networkToEtherscanAPI: {
     polygon: 'https://api.polygonscan.com/api',

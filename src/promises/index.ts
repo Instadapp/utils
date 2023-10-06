@@ -1,6 +1,7 @@
 export interface RetryOptions {
   delay?: number;
   timeouts: number[];
+  onRetry?: (error: Error, attempt: number) => void|Promise<void>;
 }
 
 export async function promiseTimeout<T> (promise: Promise<T>, ms: number) {
@@ -26,7 +27,7 @@ export function retry<T = any> (
   retriesLeft?: number
 ) {
   return new Promise<T>((resolve, reject) => {
-    const { timeouts } = options
+    const { timeouts, onRetry } = options
 
     if (typeof retriesLeft === 'undefined' || retriesLeft === null) {
       retriesLeft = timeouts.length
@@ -39,10 +40,14 @@ export function retry<T = any> (
     const execution = promiseTimeout(operation(), timeout)
 
     // If the promise is successful, resolve it and bubble the result up
-    return execution.then(resolve).catch((reason: any) => {
+    return execution.then(resolve).catch(async (reason: any) => {
       // If there are any retries left, we call the same retryOperation function again,
       // but decrementing the number of retries left by 1
       if (retriesLeft - 1 > 0) {
+        // Call onRetry if provided
+        if (onRetry) {
+          await onRetry(reason, retriesLeft)
+        }
         // Delay the new attempt slightly
         return wait(options.delay || 300)
           .then(retry.bind(null, operation, options, retriesLeft - 1))

@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { expect, describe, test } from 'vitest'
-import { toJsonRpcProvider } from '../src'
+import { JsonRpcRetryProvider, toJsonRpcProvider } from '../src'
 
 describe.concurrent('providers', () => {
   test('string', async () => {
@@ -48,6 +48,18 @@ describe.concurrent('providers', () => {
         }
       }
     )
+    expect(await provider.getBlockNumber()).toBeDefined()
+    expect(typeof await provider.getBlockNumber()).toBe('number')
+  })
+
+  test('JsonRpcRetryProvider - multi urls', async () => {
+    const provider = new JsonRpcRetryProvider([
+      'https://rpc.ankr.com/invalid',
+      'https://rpc.ankr.com/invalid-2',
+      'https://rpc.ankr.com/eth',
+      'https://eth.llamarpc.com'
+    ])
+
     expect(await provider.getBlockNumber()).toBeDefined()
     expect(typeof await provider.getBlockNumber()).toBe('number')
   })

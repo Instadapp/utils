@@ -159,6 +159,17 @@ const providerWithCustomOptions = new JsonRpcRetryProvider(
 );
 ```
 
+```ts
+import { JsonRpcRetryProvider } from "@instadapp/utils";
+
+const provider = new JsonRpcRetryProvider([
+    'https://rpc.ankr.com/invalid',
+    'https://rpc.ankr.com/invalid-2',
+    'https://rpc.ankr.com/eth',
+    'https://eth.llamarpc.com',
+])
+```
+
 ### JsonRpcRetryBatchProvider
 
 ```js
