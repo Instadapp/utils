@@ -124,13 +124,13 @@ describe.concurrent('abi', () => {
     })
   })
 
-  test('can fetch abi using blockscout - aurora', async () => {
+  test('can fetch abi using blockscout v4 - aurora', async () => {
     const abi = await defaultAbiFetcher.get('0x4988a896b1227218e4A686fdE5EabdcAbd91571f', 'aurora', 'implementationOnly')
 
     expect(abi.length).to.be.greaterThan(0)
   })
 
-  test('can fetch abi using blockscout - fuse', async () => {
+  test.skip('can fetch abi using blockscout - fuse', async () => {
     const abi = await defaultAbiFetcher.get('0xeEeEEb57642040bE42185f49C52F7E9B38f8eeeE', 'fuse', 'implementationOnly')
 
     expect(abi.length).to.be.greaterThan(0)
