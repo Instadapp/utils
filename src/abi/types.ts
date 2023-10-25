@@ -53,10 +53,16 @@ export interface IAbiFetcherOptions {
      *  @default
       {
             aurora: 'https://explorer.aurora.dev/graphiql',
-            fuse: 'https://explorer.fuse.io/graphiql',
         }
      */
-    networkToBlockscoutAPI: Partial<Record<Network, string>>,
+    networkToBlockscoutV4Graph: Partial<Record<Network, string>>,
+    /**
+     *  @default
+        {
+            fuse: 'https://explorer.fuse.io/api',
+        }
+     */
+    networkToBlockscoutV5Api: Partial<Record<Network, string>>,
     /**
      *  @default proxyAndImplementation
      */

@@ -130,7 +130,7 @@ describe.concurrent('abi', () => {
     expect(abi.length).to.be.greaterThan(0)
   })
 
-  test.skip('can fetch abi using blockscout - fuse', async () => {
+  test('can fetch abi using blockscout v5 - fuse', async () => {
     const abi = await defaultAbiFetcher.get('0xeEeEEb57642040bE42185f49C52F7E9B38f8eeeE', 'fuse', 'implementationOnly')
 
     expect(abi.length).to.be.greaterThan(0)

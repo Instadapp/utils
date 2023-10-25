@@ -39,9 +39,11 @@ const DEFAULTS: IAbiFetcherOptions = {
     'polygon-zkevm': 'https://api-zkevm.polygonscan.com/api',
     base: 'https://api.basescan.org/api'
   },
-  networkToBlockscoutAPI: {
-    aurora: 'https://explorer.aurora.dev/graphiql',
-    fuse: 'https://explorer.fuse.io/graphiql'
+  networkToBlockscoutV4Graph: {
+    aurora: 'https://explorer.aurora.dev/graphiql'
+  },
+  networkToBlockscoutV5Api: {
+    fuse: 'https://explorer.fuse.io/api'
   }
 }
 
@@ -53,14 +55,18 @@ export class AbiFetcher {
   }
 
   private async fetchABI (contractAddress: string, network: Network): Promise<JsonFragment[]> {
-    const { networkToEtherscanAPI, networkToBlockscoutAPI } = this.options
+    const { networkToEtherscanAPI, networkToBlockscoutV4Graph, networkToBlockscoutV5Api } = this.options
 
     if (networkToEtherscanAPI[network]) {
       return await this.fetchABIFromEtherscan(contractAddress, network)
     }
 
-    if (networkToBlockscoutAPI[network]) {
-      return await this.fetchABIFromBlockscout(contractAddress, network)
+    if (networkToBlockscoutV4Graph[network]) {
+      return await this.fetchABIFromBlockscoutV4(contractAddress, network)
+    }
+
+    if (networkToBlockscoutV5Api[network]) {
+      return await this.fetchABIFromBlockscoutV5(contractAddress, network)
     }
 
     throw new Error(`Couldn't fetch ABI for ${contractAddress}`)
@@ -88,14 +94,14 @@ export class AbiFetcher {
       })
   }
 
-  private async fetchABIFromBlockscout (contractAddress: string, network: Network): Promise<JsonFragment[]> {
-    const { retries, networkToBlockscoutAPI } = this.options
+  private async fetchABIFromBlockscoutV4 (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+    const { retries, networkToBlockscoutV4Graph } = this.options
 
     return await retry(
       async () =>
         await axios
           .post(
-            networkToBlockscoutAPI[network],
+            networkToBlockscoutV4Graph[network],
             {
               query: `{\n  address(hash:"${contractAddress}") {\n    \tsmartContract {\n        abi\n      }\n  }\t\n}`,
               variables: null,
@@ -108,6 +114,23 @@ export class AbiFetcher {
             }
 
             return JSON.parse(data.address.smartContract.abi)
+          }),
+      {
+        retries
+      })
+  }
+
+  private async fetchABIFromBlockscoutV5 (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+    const { retries, networkToBlockscoutV5Api } = this.options
+
+    return await retry(
+      async () =>
+        await axios
+          .get(
+            `${networkToBlockscoutV5Api[network]}/v2/smart-contracts/${contractAddress}`
+          )
+          .then(({ data }) => {
+            return data.abi
           }),
       {
         retries
