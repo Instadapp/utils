@@ -20,7 +20,7 @@ function defineWritable<T, K extends keyof T> (object: T, name: K, value: T[K]):
   Object.defineProperty(object, name, {
     enumerable: true,
     value,
-    writable: false
+    writable: true
   })
 }
 
