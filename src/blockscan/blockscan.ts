@@ -13,7 +13,7 @@ export interface BlockscanOptions {
 export class Blockscan {
   apiUrl: string
   baseUrl: string
-  timeouts = [2_500, 5_000, 10_000]
+  timeouts = [5_000, 10_000, 15_000]
   timeoutDelay = 500
 
   /**
