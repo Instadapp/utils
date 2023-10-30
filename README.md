@@ -261,7 +261,6 @@ import { Blockscan, Chain } from "@instadapp/utils";
 
 const etherscan = new Blockscan(Chain.Mainnet);
 
-await etherscan.get("0x6975be450864c02b4613023c2152ee0743572325")
 await etherscan.getTransactions("0x6975be450864c02b4613023c2152ee0743572325")
 await etherscan.getInternalTransactions("0x6975be450864c02b4613023c2152ee0743572325")
 await etherscan.getErc20TokenTransferEvents("0x6975be450864c02b4613023c2152ee0743572325")
