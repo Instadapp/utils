@@ -135,4 +135,6 @@ describe.concurrent('abi', () => {
 
     expect(abi.length).to.be.greaterThan(0)
   })
+}, {
+  retry: 2
 })

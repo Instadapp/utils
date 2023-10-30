@@ -254,6 +254,24 @@ let provider = toJsonRpcProvider(web3.currentProvider)// Web3.js provider, ex:  
 let provider = toJsonRpcProvider("https://rpc.ankr.com/eth") // Http RPC URL
 let provider = toJsonRpcProvider(new ethers.providers.JsonRpcProvider('https://rpc.ankr.com/eth')) // ethers JsonRpcProvider instance
 ```
+
+### Blockscan
+```ts
+import { Blockscan, Chain } from "@instadapp/utils";
+
+const etherscan = new Blockscan(Chain.Mainnet);
+
+await etherscan.get("0x6975be450864c02b4613023c2152ee0743572325")
+await etherscan.getTransactions("0x6975be450864c02b4613023c2152ee0743572325")
+await etherscan.getInternalTransactions("0x6975be450864c02b4613023c2152ee0743572325")
+await etherscan.getErc20TokenTransferEvents("0x6975be450864c02b4613023c2152ee0743572325")
+await etherscan.getErc721TokenTransferEvents("0x6975be450864c02b4613023c2152ee0743572325")
+await etherscan.getErc1155TokenTransferEvents("0x6975be450864c02b4613023c2152ee0743572325")
+
+const basescan = Blockscan.custom('https://basescan.org','https://api.basescan.org/api')
+await basescan.contractSourceCode('0x833589fcd6edb6e08f4c7c32d4f71b54bda02913')
+```
+
 ## 💻 Development
 
 - Clone this repository

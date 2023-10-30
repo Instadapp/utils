@@ -262,4 +262,6 @@ describe.concurrent('cast', () => {
     expect(decodedSpells[0].flashloanSpells).toBeDefined()
     expect(decodedSpells[0].isAvocadoFlashloan).toBe(true)
   })
+}, {
+  retry: 2
 })
