@@ -1,15 +1,33 @@
 import axios from 'axios'
+import { retry } from '../promises'
 import { Chain, getChainScanUrls } from './chain'
 import { ERC1155TokenTransferEvent, ERC20TokenTransferEvent, ERC721TokenTransferEvent, InternalTransaction, NormalTransaction } from './types'
+
+export interface BlockscanOptions {
+  apiUrl?: string
+  baseUrl?: string
+  timeouts?: number[]
+  timeoutDelay?: number
+}
 
 export class Blockscan {
   apiUrl: string
   baseUrl: string
+  timeouts = [2_500, 5_000, 10_000]
+  timeoutDelay = 500
 
   /**
    * Create a new client with the correct endpoints based on the chain and provided API key
   */
-  constructor (private chain: Chain | number, private apiKey?: string, options?: any) {
+  constructor (private chain: Chain | number, private apiKey?: string, options?: BlockscanOptions) {
+    if (options?.timeouts && options.timeouts.length > 0) {
+      this.timeouts = options.timeouts
+    }
+
+    if (options?.timeoutDelay) {
+      this.timeoutDelay = options.timeoutDelay
+    }
+
     if (chain === Chain.Custom) {
       if (!options?.apiUrl) {
         throw new Error('Custom chain requires apiUrl')
@@ -180,17 +198,22 @@ export class Blockscan {
   }
 
   public async query (params: { module: string, action: string, [key: string]: any }) {
-    try {
-      params = Object.assign(params, { apikey: this.apiKey })
+    return await retry(async () => {
+      try {
+        params = Object.assign(params, { apikey: this.apiKey })
 
-      const { data } = await axios.get(this.apiUrl, { params })
-      if (data.status !== '1') {
-        throw new Error(typeof data.result === 'string' ? data.result : data.message)
+        const { data } = await axios.get(this.apiUrl, { params })
+        if (data.status !== '1') {
+          throw new Error(typeof data.result === 'string' ? data.result : data.message)
+        }
+
+        return data.result
+      } catch (error) {
+        throw new Error(error.message)
       }
-
-      return data.result
-    } catch (error) {
-      throw new Error(error.message)
-    }
+    }, {
+      timeouts: this.timeouts,
+      delay: this.timeoutDelay
+    })
   }
 }
