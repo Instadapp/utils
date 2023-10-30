@@ -198,11 +198,22 @@ export class Blockscan {
   }
 
   public async query (params: { module: string, action: string, [key: string]: any }) {
+    params = Object.assign(
+      {
+        endblock: '99999999',
+        sort: 'asc',
+        offset: '10000',
+        startblock: '0',
+        page: '0'
+      },
+      params,
+      { apikey: this.apiKey }
+    )
+
     return await retry(async () => {
       try {
-        params = Object.assign(params, { apikey: this.apiKey })
-
         const { data } = await axios.get(this.apiUrl, { params })
+
         if (data.status !== '1') {
           throw new Error(typeof data.result === 'string' ? data.result : data.message)
         }
