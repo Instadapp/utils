@@ -1,8 +1,8 @@
 import { memoryCacheDriver } from './drivers'
 
 export interface ICacheLock {
-  acquire: () => Promise<boolean>|boolean
-  release: () => Promise<void>|void
+  acquire: () => Promise<boolean> | boolean
+  release: () => Promise<void> | void
 }
 
 export interface ICacheDriver {
@@ -125,5 +125,9 @@ export class Cache {
         return false
       }
     }
+  }
+
+  static async getLock (key: string, seconds: number, cb: () => Promise<void> | void) {
+    return await this.lock(key, seconds).get(cb)
   }
 }

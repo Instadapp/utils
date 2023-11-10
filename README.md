@@ -256,6 +256,11 @@ const isLocked = await Cache.lock("key", 10).get(async () => {
 });
 
 // or
+const isAcquired = await Cache.getLock("key", 10, async () => {
+  console.log("do something");
+});
+
+// or
 const lock = Cache.lock("key", 10);
 
 if (await lock.get()) {

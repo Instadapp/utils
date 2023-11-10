@@ -125,4 +125,12 @@ describe('cache', () => {
     expect(acquired).toBe(true)
     expect(notAcquired).toBe(false)
   })
+
+  test('atomic lock - getLock', async () => {
+    const acquired = await Cache.getLock('get-lock', 10, async () => {
+      await wait(1000)
+    })
+
+    expect(acquired).toBe(true)
+  })
 })
