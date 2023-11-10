@@ -163,11 +163,11 @@ const providerWithCustomOptions = new JsonRpcRetryProvider(
 import { JsonRpcRetryProvider } from "@instadapp/utils";
 
 const provider = new JsonRpcRetryProvider([
-    'https://rpc.ankr.com/invalid',
-    'https://rpc.ankr.com/invalid-2',
-    'https://rpc.ankr.com/eth',
-    'https://eth.llamarpc.com',
-])
+  "https://rpc.ankr.com/invalid",
+  "https://rpc.ankr.com/invalid-2",
+  "https://rpc.ankr.com/eth",
+  "https://eth.llamarpc.com",
+]);
 ```
 
 ### JsonRpcRetryBatchProvider
@@ -212,6 +212,15 @@ Cache.extend("mongodb", {
   async set(key: string, value: any, seconds?: number) {},
   async forget(key: string) {},
   async flush() {},
+  // optional, and experimental
+  lock(key: string, seconds: number) {
+    return {
+      async acquire() {
+        return true;
+      },
+      async release() {},
+    };
+  },
 });
 
 // Note: you should set this once per life cycle
@@ -241,34 +250,62 @@ const users = await Cache.remember("users", seconds, async () => {
 
 await Cache.store("memory").get("users:1"); // safe way to switch driver for a moment
 
+// experimental
+const isLocked = await Cache.lock("key", 10).get(async () => {
+  console.log("do something");
+});
+
+// or
+const lock = Cache.lock("key", 10);
+
+if (await lock.get()) {
+  console.log("do something");
+
+  await lock.release();
+}
 ```
 
 ### toJsonRpcProvider
+
 ```ts
 import { toJsonRpcProvider } from "@instadapp/utils";
 import { ethers } from "ethers";
 
-let provider = toJsonRpcProvider(window.ethereum) // Metamask, Rabby, ...
-let provider = toJsonRpcProvider(web3)// Web3.js instance, `web3.currentProvider` will be used internally
-let provider = toJsonRpcProvider(web3.currentProvider)// Web3.js provider, ex:  Metamask, Rabby, WalletConnect, ...
-let provider = toJsonRpcProvider("https://rpc.ankr.com/eth") // Http RPC URL
-let provider = toJsonRpcProvider(new ethers.providers.JsonRpcProvider('https://rpc.ankr.com/eth')) // ethers JsonRpcProvider instance
+let provider = toJsonRpcProvider(window.ethereum); // Metamask, Rabby, ...
+let provider = toJsonRpcProvider(web3); // Web3.js instance, `web3.currentProvider` will be used internally
+let provider = toJsonRpcProvider(web3.currentProvider); // Web3.js provider, ex:  Metamask, Rabby, WalletConnect, ...
+let provider = toJsonRpcProvider("https://rpc.ankr.com/eth"); // Http RPC URL
+let provider = toJsonRpcProvider(
+  new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth")
+); // ethers JsonRpcProvider instance
 ```
 
 ### Blockscan
+
 ```ts
 import { Blockscan, Chain } from "@instadapp/utils";
 
 const etherscan = new Blockscan(Chain.Mainnet);
 
-await etherscan.getTransactions("0x6975be450864c02b4613023c2152ee0743572325")
-await etherscan.getInternalTransactions("0x6975be450864c02b4613023c2152ee0743572325")
-await etherscan.getErc20TokenTransferEvents("0x6975be450864c02b4613023c2152ee0743572325")
-await etherscan.getErc721TokenTransferEvents("0x6975be450864c02b4613023c2152ee0743572325")
-await etherscan.getErc1155TokenTransferEvents("0x6975be450864c02b4613023c2152ee0743572325")
+await etherscan.getTransactions("0x6975be450864c02b4613023c2152ee0743572325");
+await etherscan.getInternalTransactions(
+  "0x6975be450864c02b4613023c2152ee0743572325"
+);
+await etherscan.getErc20TokenTransferEvents(
+  "0x6975be450864c02b4613023c2152ee0743572325"
+);
+await etherscan.getErc721TokenTransferEvents(
+  "0x6975be450864c02b4613023c2152ee0743572325"
+);
+await etherscan.getErc1155TokenTransferEvents(
+  "0x6975be450864c02b4613023c2152ee0743572325"
+);
 
-const basescan = Blockscan.custom('https://basescan.org','https://api.basescan.org/api')
-await basescan.contractSourceCode('0x833589fcd6edb6e08f4c7c32d4f71b54bda02913')
+const basescan = Blockscan.custom(
+  "https://basescan.org",
+  "https://api.basescan.org/api"
+);
+await basescan.contractSourceCode("0x833589fcd6edb6e08f4c7c32d4f71b54bda02913");
 ```
 
 ## 💻 Development

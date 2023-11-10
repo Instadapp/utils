@@ -1,10 +1,16 @@
 import { memoryCacheDriver } from './drivers'
 
+export interface ICacheLock {
+  acquire: () => Promise<boolean>|boolean
+  release: () => Promise<void>|void
+}
+
 export interface ICacheDriver {
   get(key: string): Promise<any>
   set(key: string, value: any, seconds?: number): Promise<void>
   forget(key: string): Promise<void>
   flush(): Promise<void>
+  lock?: (key: string, seconds: number) => ICacheLock
 }
 
 export class Cache {
@@ -92,5 +98,32 @@ export class Cache {
     }
 
     return value
+  }
+
+  static lock (key: string, seconds: number) {
+    if (!this.driver.lock) {
+      throw new Error(`Driver ${this.defaultDriver} does not support locking`)
+    }
+
+    const lock = this.driver.lock(key, seconds)
+
+    return {
+      release: lock.release,
+      get: async (cb?: () => Promise<void> | void): Promise<boolean> => {
+        if (!cb) {
+          return await lock.acquire()
+        }
+
+        if (await lock.acquire()) {
+          await cb()
+
+          await lock.release()
+
+          return true
+        }
+
+        return false
+      }
+    }
   }
 }

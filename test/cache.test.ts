@@ -93,4 +93,36 @@ describe('cache', () => {
 
     expect(await Cache.get('test')).toBe(69)
   })
+
+  test('atomic lock', async () => {
+    const lock = Cache.lock('lock', 10)
+
+    if (await lock.get()) {
+      await wait(1000)
+
+      await lock.release()
+    }
+  })
+
+  test('atomic lock - cb', async () => {
+    const acquired = await Cache.lock('lock-cb', 10).get(async () => {
+      await wait(1000)
+    })
+
+    expect(acquired).toBe(true)
+  })
+
+  test('atomic lock - multiple', async () => {
+    const [acquired, notAcquired] = await Promise.all([
+      Cache.lock('lock-multiple', 10).get(async () => {
+        await wait(1000)
+      }),
+      Cache.lock('lock-multiple', 10).get(async () => {
+        await wait(1000)
+      })
+    ])
+
+    expect(acquired).toBe(true)
+    expect(notAcquired).toBe(false)
+  })
 })
