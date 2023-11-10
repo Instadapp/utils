@@ -251,23 +251,40 @@ const users = await Cache.remember("users", seconds, async () => {
 await Cache.store("memory").get("users:1"); // safe way to switch driver for a moment
 
 // experimental
-const isLocked = await Cache.lock("key", 10).get(async () => {
+const isLocked = await Cache.lock("key").get(async () => {
   console.log("do something");
 });
 
 // or
-const isAcquired = await Cache.getLock("key", 10, async () => {
+const isAcquired = await Cache.getLock("key", async () => {
   console.log("do something");
 });
 
 // or
-const lock = Cache.lock("key", 10);
+const lock = Cache.lock("key");
 
 if (await lock.get()) {
   console.log("do something");
 
   await lock.release();
 }
+
+// or
+const lock = Cache.lock("key");
+
+try {
+  await lock.block(5);
+  // Lock acquired after waiting a maximum of 5 seconds...
+} catch {
+  // Unable to acquire lock...
+} finally {
+  $lock.release();
+}
+
+// or
+await Cache.block("key", 5, async () => {
+  // Lock acquired after waiting a maximum of 5 seconds...
+});
 ```
 
 ### toJsonRpcProvider

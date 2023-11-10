@@ -33,8 +33,8 @@ export const memoryCacheDriver: ICacheDriver = {
 
     await Promise.resolve()
   },
-  lock (key, seconds) {
-    return new MemoryLock(key, seconds)
+  lock (key, seconds, owner) {
+    return new MemoryLock(key, seconds, owner)
   }
 }
 
@@ -42,7 +42,7 @@ const cacheLock = new Map()
 
 class MemoryLock implements ICacheLock {
   // eslint-disable-next-line no-useless-constructor
-  constructor (private key: string, private seconds: number) { }
+  constructor (private key: string, private seconds: number, private owner: string) { }
 
   acquire () {
     const currentTime = Date.now()
@@ -60,10 +60,6 @@ class MemoryLock implements ICacheLock {
   }
 
   release () {
-    const lockExpiry = cacheLock.get(this.key)
-
-    if (lockExpiry && lockExpiry > Date.now()) {
-      cacheLock.delete(this.key)
-    }
+    cacheLock.delete(this.key)
   }
 }

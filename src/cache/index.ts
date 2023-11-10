@@ -10,7 +10,7 @@ export interface ICacheDriver {
   set(key: string, value: any, seconds?: number): Promise<void>
   forget(key: string): Promise<void>
   flush(): Promise<void>
-  lock?: (key: string, seconds: number) => ICacheLock
+  lock?: (key: string, seconds: number, owner: string) => ICacheLock
 }
 
 export class Cache {
@@ -100,15 +100,15 @@ export class Cache {
     return value
   }
 
-  static lock (key: string, seconds: number) {
+  static lock (key: string, options: { seconds?: number, owner?: string, sleepMilliseconds?: number } = {}) {
     if (!this.driver.lock) {
       throw new Error(`Driver ${this.defaultDriver} does not support locking`)
     }
 
-    const lock = this.driver.lock(key, seconds)
+    const lock = this.driver.lock(key, options.seconds ?? 86400, options.owner ?? Date.now().toString())
 
     return {
-      release: lock.release,
+      release: lock.release.bind(lock),
       get: async (cb?: () => Promise<void> | void): Promise<boolean> => {
         if (!cb) {
           return await lock.acquire()
@@ -123,11 +123,34 @@ export class Cache {
         }
 
         return false
+      },
+      block: async (timeout: number, cb?: () => Promise<void> | void): Promise<void> => {
+        const starting = Date.now()
+
+        while (!await lock.acquire()) {
+          await new Promise(resolve => setTimeout(resolve, options.sleepMilliseconds ?? 300))
+
+          if (Date.now() - timeout * 1000 >= starting) {
+            throw new Error(`Lock ${key} is not acquired within ${timeout} seconds`)
+          }
+        }
+
+        if (cb) {
+          try {
+            await cb()
+          } finally {
+            await lock.release()
+          }
+        }
       }
     }
   }
 
-  static async getLock (key: string, seconds: number, cb: () => Promise<void> | void) {
-    return await this.lock(key, seconds).get(cb)
+  static async getLock (key: string, cb: () => Promise<void> | void, options: { seconds?: number, owner?: string, sleepMilliseconds?: number } = {}) {
+    return await this.lock(key, options).get(cb)
+  }
+
+  static async block (key: string, timeout: number, cb: () => Promise<void> | void, options: { seconds?: number, owner?: string, sleepMilliseconds?: number } = {}) {
+    return await this.lock(key, options).block(timeout, cb)
   }
 }

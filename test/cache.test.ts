@@ -95,7 +95,7 @@ describe('cache', () => {
   })
 
   test('atomic lock', async () => {
-    const lock = Cache.lock('lock', 10)
+    const lock = Cache.lock('lock')
 
     if (await lock.get()) {
       await wait(1000)
@@ -105,7 +105,7 @@ describe('cache', () => {
   })
 
   test('atomic lock - cb', async () => {
-    const acquired = await Cache.lock('lock-cb', 10).get(async () => {
+    const acquired = await Cache.lock('lock-cb').get(async () => {
       await wait(1000)
     })
 
@@ -114,10 +114,10 @@ describe('cache', () => {
 
   test('atomic lock - multiple', async () => {
     const [acquired, notAcquired] = await Promise.all([
-      Cache.lock('lock-multiple', 10).get(async () => {
+      Cache.lock('lock-multiple').get(async () => {
         await wait(1000)
       }),
-      Cache.lock('lock-multiple', 10).get(async () => {
+      Cache.lock('lock-multiple').get(async () => {
         await wait(1000)
       })
     ])
@@ -127,10 +127,64 @@ describe('cache', () => {
   })
 
   test('atomic lock - getLock', async () => {
-    const acquired = await Cache.getLock('get-lock', 10, async () => {
+    const acquired = await Cache.getLock('get-lock', async () => {
       await wait(1000)
     })
 
     expect(acquired).toBe(true)
+  })
+
+  test('atomic lock - block', async () => {
+    const lock1 = Cache.lock('block')
+
+    await lock1.get()
+
+    setTimeout(async () => {
+      await lock1.release()
+    }, 1000)
+
+    const lock2 = Cache.lock('block')
+
+    await lock2.block(5)
+
+    expect(true).toBe(true)
+  })
+
+  test('atomic lock - block cb', async () => {
+    const lock1 = Cache.lock('block')
+
+    await lock1.get()
+
+    setTimeout(async () => {
+      await lock1.release()
+    }, 1000)
+
+    const lock2 = Cache.lock('block')
+
+    let lock2Acquired = false
+
+    await lock2.block(5, () => {
+      lock2Acquired = true
+    })
+
+    expect(lock2Acquired).toBe(true)
+  })
+
+  test('atomic block', async () => {
+    const lock1 = Cache.lock('block')
+
+    await lock1.get()
+
+    setTimeout(async () => {
+      await lock1.release()
+    }, 1000)
+
+    let lock2Acquired = false
+
+    await Cache.block('block', 5, () => {
+      lock2Acquired = true
+    })
+
+    expect(lock2Acquired).toBe(true)
   })
 })
