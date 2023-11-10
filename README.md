@@ -278,7 +278,7 @@ try {
 } catch {
   // Unable to acquire lock...
 } finally {
-  lock.release();
+  await lock.release();
 }
 
 // or
