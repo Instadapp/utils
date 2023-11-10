@@ -40,9 +40,9 @@ const DEFAULTS: IAbiFetcherOptions = {
     base: 'https://api.basescan.org/api'
   },
   networkToBlockscoutV4Graph: {
-    aurora: 'https://explorer.aurora.dev/graphiql'
   },
   networkToBlockscoutV5Api: {
+    aurora: 'https://explorer.aurora.dev/api',
     fuse: 'https://explorer.fuse.io/api'
   }
 }

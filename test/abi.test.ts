@@ -124,7 +124,7 @@ describe.concurrent('abi', () => {
     })
   })
 
-  test('can fetch abi using blockscout v4 - aurora', async () => {
+  test('can fetch abi using blockscout v5 - aurora', async () => {
     const abi = await defaultAbiFetcher.get('0x4988a896b1227218e4A686fdE5EabdcAbd91571f', 'aurora', 'implementationOnly')
 
     expect(abi.length).to.be.greaterThan(0)
