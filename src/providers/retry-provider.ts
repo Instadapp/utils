@@ -4,7 +4,7 @@ import { JsonRpcProvider, StaticJsonRpcProvider, JsonRpcBatchProvider, StaticJso
 export class JsonRpcRetryProvider extends JsonRpcProvider {
   urls: string[]
   urlIndex: number = 0
-  timeouts: number[] = [5_000, 10_000, 15_000]
+  timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
 
   constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
@@ -43,7 +43,7 @@ export class JsonRpcRetryProvider extends JsonRpcProvider {
 export class JsonRpcRetryBatchProvider extends JsonRpcBatchProvider {
   urls: string[]
   urlIndex: number = 0
-  timeouts: number[] = [5_000, 10_000, 15_000]
+  timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
 
   constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
@@ -82,7 +82,7 @@ export class JsonRpcRetryBatchProvider extends JsonRpcBatchProvider {
 export class StaticJsonRpcRetryProvider extends StaticJsonRpcProvider {
   urls: string[]
   urlIndex: number = 0
-  timeouts: number[] = [5_000, 10_000, 15_000]
+  timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
 
   constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
@@ -121,7 +121,7 @@ export class StaticJsonRpcRetryProvider extends StaticJsonRpcProvider {
 export class StaticJsonRpcRetryBatchProvider extends StaticJsonRpcBatchProvider {
   urls: string[]
   urlIndex: number = 0
-  timeouts: number[] = [5_000, 10_000, 15_000]
+  timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
 
   constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
