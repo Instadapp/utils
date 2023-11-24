@@ -6,8 +6,9 @@ export class JsonRpcRetryProvider extends JsonRpcProvider {
   urlIndex: number = 0
   timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
+  disableRetriesForMethods: string[] = ['eth_sendRawTransaction', 'eth_signTransaction', 'txn_broadcast']
 
-  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
+  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number, disableRetriesForMethods?: string[] }) {
     urls = Array.isArray(urls) ? urls : [urls]
 
     super(urls[0])
@@ -23,10 +24,18 @@ export class JsonRpcRetryProvider extends JsonRpcProvider {
       this.delay = options.delay
     }
 
+    if (options && options.disableRetriesForMethods) {
+      this.disableRetriesForMethods = options.disableRetriesForMethods
+    }
+
     Object.setPrototypeOf(this, JsonRpcRetryProvider.prototype)
   }
 
   public send (method: string, params: Array<any>): Promise<any> {
+    if (this.disableRetriesForMethods.includes(method)) {
+      return super.send(method, params)
+    }
+
     const operation = () => super.send(method, params)
 
     return retry(operation, {
@@ -45,8 +54,9 @@ export class JsonRpcRetryBatchProvider extends JsonRpcBatchProvider {
   urlIndex: number = 0
   timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
+  disableRetriesForMethods: string[] = ['eth_sendRawTransaction', 'eth_signTransaction', 'txn_broadcast']
 
-  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
+  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number, disableRetriesForMethods?: string[] }) {
     urls = Array.isArray(urls) ? urls : [urls]
 
     super(urls[0])
@@ -62,10 +72,18 @@ export class JsonRpcRetryBatchProvider extends JsonRpcBatchProvider {
       this.delay = options.delay
     }
 
+    if (options && options.disableRetriesForMethods) {
+      this.disableRetriesForMethods = options.disableRetriesForMethods
+    }
+
     Object.setPrototypeOf(this, JsonRpcRetryProvider.prototype)
   }
 
   public send (method: string, params: Array<any>): Promise<any> {
+    if (this.disableRetriesForMethods.includes(method)) {
+      return super.send(method, params)
+    }
+
     const operation = () => super.send(method, params)
 
     return retry(operation, {
@@ -84,8 +102,9 @@ export class StaticJsonRpcRetryProvider extends StaticJsonRpcProvider {
   urlIndex: number = 0
   timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
+  disableRetriesForMethods: string[] = ['eth_sendRawTransaction', 'eth_signTransaction', 'txn_broadcast']
 
-  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
+  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number, disableRetriesForMethods?: string[] }) {
     urls = Array.isArray(urls) ? urls : [urls]
 
     super(urls[0])
@@ -101,10 +120,18 @@ export class StaticJsonRpcRetryProvider extends StaticJsonRpcProvider {
       this.delay = options.delay
     }
 
+    if (options && options.disableRetriesForMethods) {
+      this.disableRetriesForMethods = options.disableRetriesForMethods
+    }
+
     Object.setPrototypeOf(this, StaticJsonRpcRetryProvider.prototype)
   }
 
   public send (method: string, params: Array<any>): Promise<any> {
+    if (this.disableRetriesForMethods.includes(method)) {
+      return super.send(method, params)
+    }
+
     const operation = () => super.send(method, params)
 
     return retry(operation, {
@@ -123,8 +150,9 @@ export class StaticJsonRpcRetryBatchProvider extends StaticJsonRpcBatchProvider 
   urlIndex: number = 0
   timeouts: number[] = [10_000, 15_000, 20_000]
   delay: number = 300
+  disableRetriesForMethods: string[] = ['eth_sendRawTransaction', 'eth_signTransaction', 'txn_broadcast']
 
-  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number }) {
+  constructor (urls: string | string[], options?: { timeouts?: number[], delay?: number, disableRetriesForMethods?: string[] }) {
     urls = Array.isArray(urls) ? urls : [urls]
 
     super(urls[0])
@@ -140,10 +168,18 @@ export class StaticJsonRpcRetryBatchProvider extends StaticJsonRpcBatchProvider 
       this.delay = options.delay
     }
 
+    if (options && options.disableRetriesForMethods) {
+      this.disableRetriesForMethods = options.disableRetriesForMethods
+    }
+
     Object.setPrototypeOf(this, StaticJsonRpcRetryProvider.prototype)
   }
 
   public send (method: string, params: Array<any>): Promise<any> {
+    if (this.disableRetriesForMethods.includes(method)) {
+      return super.send(method, params)
+    }
+
     const operation = () => super.send(method, params)
 
     return retry(operation, {
