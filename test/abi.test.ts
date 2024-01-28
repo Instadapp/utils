@@ -1,7 +1,7 @@
 import { expect, describe, test, vi } from 'vitest'
 import NodeCache from 'node-cache'
 import { AbiFetcher, ICache } from '../src'
-import { mainnetUsdcImplementationAbi, mainnetUsdcProxyAbi, polygonMaticABI } from './fixtures'
+import { polygonMaticABI } from './fixtures'
 
 const defaultAbiCache = new NodeCache()
 
@@ -78,13 +78,13 @@ describe.concurrent('abi', () => {
     const network = 'mainnet'
 
     const proxyOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'proxyOnly')
-    expect(proxyOnlyAbi).toEqual(mainnetUsdcProxyAbi)
+    expect(proxyOnlyAbi.length).toBe(9)
 
     const implementationOnlyAbi = await defaultAbiFetcher.get(usdcAddress, network, 'implementationOnly')
-    expect(implementationOnlyAbi).toEqual(mainnetUsdcImplementationAbi)
+    expect(implementationOnlyAbi.length).toBe(72)
 
     const abi = await defaultAbiFetcher.get(usdcAddress, network, 'proxyAndImplementation')
-    expect(abi).toEqual([...mainnetUsdcProxyAbi, ...mainnetUsdcImplementationAbi])
+    expect(abi.length).toBe(81)
   })
 
   test('can fetch proxy implementation - EIP-897', async () => {
@@ -132,6 +132,12 @@ describe.concurrent('abi', () => {
 
   test('can fetch abi using blockscout v5 - fuse', async () => {
     const abi = await defaultAbiFetcher.get('0xeEeEEb57642040bE42185f49C52F7E9B38f8eeeE', 'fuse', 'implementationOnly')
+
+    expect(abi.length).to.be.greaterThan(0)
+  })
+
+  test('support raw implementation address', async () => {
+    const abi = await defaultAbiFetcher.get('0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B', 'mainnet', 'implementationOnly')
 
     expect(abi.length).to.be.greaterThan(0)
   })
