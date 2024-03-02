@@ -141,6 +141,11 @@ describe.concurrent('abi', () => {
 
     expect(abi.length).to.be.greaterThan(0)
   })
+
+  test('support fluid proxy implementation address', async () => {
+    const abi = await defaultAbiFetcher.get('0x264786EF916af64a1DB19F513F24a3681734ce92', 'mainnet', 'implementationOnly')
+    expect(abi.length).to.be.greaterThan(0)
+  })
 }, {
   retry: 2
 })

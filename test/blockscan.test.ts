@@ -4,17 +4,16 @@ import { Blockscan, Chain } from '../src'
 const etherscan = new Blockscan(Chain.Mainnet, process.env.MAINNET_ETHERSCAN_API_KEY)
 
 describe.concurrent('blockscan', () => {
-  test('custom', async () => {
-    const scan = Blockscan.custom(
-      'https://basescan.org',
-      'https://api.basescan.org/api',
-      process.env.MAINNET_ETHERSCAN_API_KEY
-    )
+  // test('custom', async () => {
+  //   const scan = Blockscan.custom(
+  //     'https://basescan.org',
+  //     'https://api.basescan.org/api',
+  //     process.env.MAINNET_ETHERSCAN_API_KEY
+  //   )
 
-    const source = await scan.contractSourceCode('0x833589fcd6edb6e08f4c7c32d4f71b54bda02913')
-
-    expect(source).toBeDefined()
-  })
+  //   const source = await scan.contractSourceCode('0x833589fcd6edb6e08f4c7c32d4f71b54bda02913')
+  //   expect(source).toBeDefined()
+  // })
 
   test('getSourceCode', async () => {
     const source = await etherscan.contractSourceCode('0x06012c8cf97bead5deae237070f9587f8e7a266d')

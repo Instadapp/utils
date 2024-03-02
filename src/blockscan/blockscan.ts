@@ -213,7 +213,6 @@ export class Blockscan {
     return await retry(async () => {
       try {
         const { data } = await axios.get(this.apiUrl, { params })
-
         if (data.status !== '1') {
           throw new Error(typeof data.result === 'string' ? data.result : data.message)
         }

@@ -243,6 +243,26 @@ export class AbiFetcher {
         implementationAddress = await contract.comptrollerImplementation()
         implementationAbi = await this._get(implementationAddress, network, metadata)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+      } else if (JSON.stringify(originalAbi || []).includes('implementation')) {
+        try {
+          const provider = new JsonRpcRetryProvider(rpcProviderUrl[network])
+
+          for (const implementationStorageLocation of implementationStorageLocations) {
+            try {
+              const implementation = await provider.getStorageAt(contractAddress, implementationStorageLocation)
+              const address = getAddress(`0x${implementation.slice(-40)}`)
+
+              if (address && address !== '0x0000000000000000000000000000000000000000') {
+                const implementationAbi = await this._get(address, network, metadata)
+                return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+              }
+            } catch (error) {
+
+            }
+          }
+        } catch (error) {
+
+        }
       }
     }
 
