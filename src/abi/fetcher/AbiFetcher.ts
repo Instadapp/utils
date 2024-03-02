@@ -243,7 +243,10 @@ export class AbiFetcher {
         implementationAddress = await contract.comptrollerImplementation()
         implementationAbi = await this._get(implementationAddress, network, metadata)
         return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
-      } else if (JSON.stringify(originalAbi || []).includes('implementation')) {
+      } else if (
+        originalAbi.some(item => item.type === 'fallback') ||
+        JSON.stringify(originalAbi || []).includes('implementation')
+      ) {
         try {
           const provider = new JsonRpcRetryProvider(rpcProviderUrl[network])
 
