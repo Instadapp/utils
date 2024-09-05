@@ -25,7 +25,8 @@ const DEFAULTS: IAbiFetcherOptions = {
     gnosis: 'https://rpc.gnosischain.com',
     'polygon-zkevm': 'https://zkevm-rpc.com',
     base: 'https://mainnet.base.org',
-    fuse: 'https://rpc.fuse.io'
+    fuse: 'https://rpc.fuse.io',
+    scroll: 'https://rpc.ankr.com/scroll'
   },
   networkToEtherscanAPI: {
     polygon: 'https://api.polygonscan.com/api',
@@ -37,7 +38,8 @@ const DEFAULTS: IAbiFetcherOptions = {
     bsc: 'https://api.bscscan.com/api',
     gnosis: 'https://api.gnosisscan.io/api',
     'polygon-zkevm': 'https://api-zkevm.polygonscan.com/api',
-    base: 'https://api.basescan.org/api'
+    base: 'https://api.basescan.org/api',
+    scroll: 'https://api.scrollscan.com/api'
   },
   networkToBlockscoutV4Graph: {
   },
