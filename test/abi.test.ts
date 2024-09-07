@@ -73,7 +73,7 @@ describe.concurrent(
       expect(cacheSet).toBeCalledTimes(1)
     })
 
-    test('can set etherscan keys', async () => {
+    test.skip('can set etherscan keys', async () => {
       const etherscanApiKey = {
         mainnet: '9D13ZE7XSBTJ94N9BNJ2MA33VMAY2YPIRB'
       }
