@@ -26,7 +26,10 @@ const DEFAULTS: IAbiFetcherOptions = {
     'polygon-zkevm': 'https://zkevm-rpc.com',
     base: 'https://mainnet.base.org',
     fuse: 'https://rpc.fuse.io',
-    scroll: 'https://rpc.ankr.com/scroll'
+    scroll: 'https://rpc.ankr.com/scroll',
+    mode: 'https://1rpc.io/mode',
+    blast: 'https://rpc.blast.io',
+    linea: 'https://1rpc.io/linea'
   },
   networkToEtherscanAPI: {
     polygon: 'https://api.polygonscan.com/api',
@@ -39,10 +42,14 @@ const DEFAULTS: IAbiFetcherOptions = {
     gnosis: 'https://api.gnosisscan.io/api',
     'polygon-zkevm': 'https://api-zkevm.polygonscan.com/api',
     base: 'https://api.basescan.org/api',
-    scroll: 'https://api.scrollscan.com/api'
+    scroll: 'https://api.scrollscan.com/api',
+    fuse: 'https://explorer.fuse.io/api',
+    mode: 'https://api.routescan.io/v2/network/mainnet/evm/34443/etherscan/api',
+    blast: 'https://api.blastscan.io/api',
+    linea: 'https://api.lineascan.build/api',
+    aurora: 'https://explorer.aurora.dev/api'
   },
-  networkToBlockscoutV4Graph: {
-  },
+  networkToBlockscoutV4Graph: {},
   networkToBlockscoutV5Api: {
     aurora: 'https://explorer.aurora.dev/api',
     fuse: 'https://explorer.fuse.io/api'
@@ -56,8 +63,15 @@ export class AbiFetcher {
     this.options = Object.assign({}, DEFAULTS, options)
   }
 
-  private async fetchABI (contractAddress: string, network: Network): Promise<JsonFragment[]> {
-    const { networkToEtherscanAPI, networkToBlockscoutV4Graph, networkToBlockscoutV5Api } = this.options
+  private async fetchABI (
+    contractAddress: string,
+    network: Network
+  ): Promise<JsonFragment[]> {
+    const {
+      networkToEtherscanAPI,
+      networkToBlockscoutV4Graph,
+      networkToBlockscoutV5Api
+    } = this.options
 
     if (networkToEtherscanAPI[network]) {
       return await this.fetchABIFromEtherscan(contractAddress, network)
@@ -74,42 +88,44 @@ export class AbiFetcher {
     throw new Error(`Couldn't fetch ABI for ${contractAddress}`)
   }
 
-  private async fetchABIFromEtherscan (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+  private async fetchABIFromEtherscan (
+    contractAddress: string,
+    network: Network
+  ): Promise<JsonFragment[]> {
     const { retries, networkToEtherscanAPI, etherscanApiKey } = this.options
 
     return await retry(
       async () =>
         await axios
-          .get(
-            networkToEtherscanAPI[network], {
-              params: {
-                module: 'contract',
-                action: 'getabi',
-                address: contractAddress,
-                apikey: etherscanApiKey ? etherscanApiKey[network] : undefined
-              }
+          .get(networkToEtherscanAPI[network], {
+            params: {
+              module: 'contract',
+              action: 'getabi',
+              address: contractAddress,
+              apikey: etherscanApiKey ? etherscanApiKey[network] : undefined
             }
-          )
+          })
           .then(({ data }) => JSON.parse(data.result)),
       {
         retries
-      })
+      }
+    )
   }
 
-  private async fetchABIFromBlockscoutV4 (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+  private async fetchABIFromBlockscoutV4 (
+    contractAddress: string,
+    network: Network
+  ): Promise<JsonFragment[]> {
     const { retries, networkToBlockscoutV4Graph } = this.options
 
     return await retry(
       async () =>
         await axios
-          .post(
-            networkToBlockscoutV4Graph[network],
-            {
-              query: `{\n  address(hash:"${contractAddress}") {\n    \tsmartContract {\n        abi\n      }\n  }\t\n}`,
-              variables: null,
-              operationName: null
-            }
-          )
+          .post(networkToBlockscoutV4Graph[network], {
+            query: `{\n  address(hash:"${contractAddress}") {\n    \tsmartContract {\n        abi\n      }\n  }\t\n}`,
+            variables: null,
+            operationName: null
+          })
           .then(({ data: { data } }) => {
             if (data.errors) {
               throw new Error(data.errors[0].message)
@@ -119,10 +135,14 @@ export class AbiFetcher {
           }),
       {
         retries
-      })
+      }
+    )
   }
 
-  private async fetchABIFromBlockscoutV5 (contractAddress: string, network: Network): Promise<JsonFragment[]> {
+  private async fetchABIFromBlockscoutV5 (
+    contractAddress: string,
+    network: Network
+  ): Promise<JsonFragment[]> {
     const { retries, networkToBlockscoutV5Api } = this.options
 
     return await retry(
@@ -136,10 +156,15 @@ export class AbiFetcher {
           }),
       {
         retries
-      })
+      }
+    )
   }
 
-  private async _get (contractAddress: string, network: Network, metadata?: Record<string, any>): Promise<JsonFragment[]> {
+  private async _get (
+    contractAddress: string,
+    network: Network,
+    metadata?: Record<string, any>
+  ): Promise<JsonFragment[]> {
     const { cache } = this.options
 
     try {
@@ -157,19 +182,20 @@ export class AbiFetcher {
         if (abi) {
           return abi
         }
-      } catch (error) {
-
-      }
+      } catch (error) {}
     }
 
     try {
       const abi = await this.fetchABI(contractAddress, network)
       if (cache) {
         try {
-          await cache.set(`${network}:${contractAddress}`, abi, network, metadata)
-        } catch (error) {
-
-        }
+          await cache.set(
+            `${network}:${contractAddress}`,
+            abi,
+            network,
+            metadata
+          )
+        } catch (error) {}
       }
 
       return abi
@@ -178,8 +204,17 @@ export class AbiFetcher {
     }
   }
 
-  async get (contractAddress: string, network: Network, proxyFetchMode?: ProxyFetchMode, metadata?: Record<string, any>): Promise<JsonFragment[]> {
-    const { rpcProviderUrl, implementationStorageLocations, proxyFetchMode: defaulProxyFetchMode } = this.options
+  async get (
+    contractAddress: string,
+    network: Network,
+    proxyFetchMode?: ProxyFetchMode,
+    metadata?: Record<string, any>
+  ): Promise<JsonFragment[]> {
+    const {
+      rpcProviderUrl,
+      implementationStorageLocations,
+      proxyFetchMode: defaulProxyFetchMode
+    } = this.options
     proxyFetchMode = proxyFetchMode || defaulProxyFetchMode
     const originalAbi = await this._get(contractAddress, network, metadata)
 
@@ -188,63 +223,137 @@ export class AbiFetcher {
       let implementationAddress: string
       let implementationAbi: JsonFragment[] = []
 
-      if (originalAbi.some(item => item.type === 'function' && item.name === 'implementation')) {
+      if (
+        originalAbi.some(
+          item => item.type === 'function' && item.name === 'implementation'
+        )
+      ) {
         // EIP-897 DelegateProxy
-        if (originalAbi.some(item => item.type === 'function' && item.name === 'proxyType')) {
-          const contract = new Contract(contractAddress, originalAbi, provider as any)
+        if (
+          originalAbi.some(
+            item => item.type === 'function' && item.name === 'proxyType'
+          )
+        ) {
+          const contract = new Contract(
+            contractAddress,
+            originalAbi,
+            provider as any
+          )
           implementationAddress = await contract.implementation()
-        } else { //  EIP-1967: Standard Proxy Storage Slots
+        } else {
+          //  EIP-1967: Standard Proxy Storage Slots
           for (const implementationStorageLocation of implementationStorageLocations) {
-            if (implementationAddress) { break }
+            if (implementationAddress) {
+              break
+            }
 
             try {
-              const implementation = await provider.getStorageAt(contractAddress, implementationStorageLocation)
+              const implementation = await provider.getStorageAt(
+                contractAddress,
+                implementationStorageLocation
+              )
               const address = getAddress(`0x${implementation.slice(-40)}`)
 
-              if (address && address !== '0x0000000000000000000000000000000000000000') {
+              if (
+                address &&
+                address !== '0x0000000000000000000000000000000000000000'
+              ) {
                 implementationAddress = address
               }
-            } catch (error) {
-
-            }
+            } catch (error) {}
           }
         }
 
         if (!implementationAddress) {
           try {
-            const contract = new Contract(contractAddress, originalAbi, provider as any)
+            const contract = new Contract(
+              contractAddress,
+              originalAbi,
+              provider as any
+            )
             implementationAddress = await contract.implementation()
-          } catch (error) {
-
-          }
+          } catch (error) {}
         }
 
         if (implementationAddress) {
-          implementationAbi = await this._get(implementationAddress, network, metadata)
-          return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+          implementationAbi = await this._get(
+            implementationAddress,
+            network,
+            metadata
+          )
+          return proxyFetchMode === 'implementationOnly'
+            ? implementationAbi
+            : [...originalAbi, ...implementationAbi]
         } else if (proxyFetchMode === 'implementationOnly') {
-          throw new Error(`Couldn't fetch ImplementationOnly ABI for ${contractAddress}`)
+          throw new Error(
+            `Couldn't fetch ImplementationOnly ABI for ${contractAddress}`
+          )
         } else {
           return originalAbi
         }
-      } else if (originalAbi.some(item => item.type === 'function' && item.name === 'getDummyImplementation')) {
-        const contract = new Contract(contractAddress, originalAbi, provider as any)
+      } else if (
+        originalAbi.some(
+          item =>
+            item.type === 'function' && item.name === 'getDummyImplementation'
+        )
+      ) {
+        const contract = new Contract(
+          contractAddress,
+          originalAbi,
+          provider as any
+        )
 
         implementationAddress = await contract.getDummyImplementation()
-        implementationAbi = await this._get(implementationAddress, network, metadata)
-        return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
-      } else if (originalAbi.some(item => item.type === 'function' && item.name === 'implementations')) {
-        const contract = new Contract(contractAddress, originalAbi, provider as any)
+        implementationAbi = await this._get(
+          implementationAddress,
+          network,
+          metadata
+        )
+        return proxyFetchMode === 'implementationOnly'
+          ? implementationAbi
+          : [...originalAbi, ...implementationAbi]
+      } else if (
+        originalAbi.some(
+          item => item.type === 'function' && item.name === 'implementations'
+        )
+      ) {
+        const contract = new Contract(
+          contractAddress,
+          originalAbi,
+          provider as any
+        )
 
         implementationAddress = await contract.implementations()
-        implementationAbi = await this._get(implementationAddress, network, metadata)
-        return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
-      } else if (originalAbi.some(item => item.type === 'function' && item.name === 'comptrollerImplementation')) {
-        const contract = new Contract(contractAddress, originalAbi, provider as any)
+        implementationAbi = await this._get(
+          implementationAddress,
+          network,
+          metadata
+        )
+        return proxyFetchMode === 'implementationOnly'
+          ? implementationAbi
+          : [...originalAbi, ...implementationAbi]
+      } else if (
+        originalAbi.some(
+          item =>
+            item.type === 'function' &&
+            item.name === 'comptrollerImplementation'
+        )
+      ) {
+        const contract = new Contract(
+          contractAddress,
+          originalAbi,
+          provider as any
+        )
 
         implementationAddress = await contract.comptrollerImplementation()
-        implementationAbi = await this._get(implementationAddress, network, metadata)
-        return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+        implementationAbi = await this._get(
+          implementationAddress,
+          network,
+          metadata
+        )
+        return proxyFetchMode === 'implementationOnly'
+          ? implementationAbi
+          : [...originalAbi, ...implementationAbi]
       } else if (
         originalAbi.some(item => item.type === 'fallback') ||
         JSON.stringify(originalAbi || []).includes('implementation')
@@ -254,20 +363,28 @@ export class AbiFetcher {
 
           for (const implementationStorageLocation of implementationStorageLocations) {
             try {
-              const implementation = await provider.getStorageAt(contractAddress, implementationStorageLocation)
+              const implementation = await provider.getStorageAt(
+                contractAddress,
+                implementationStorageLocation
+              )
               const address = getAddress(`0x${implementation.slice(-40)}`)
 
-              if (address && address !== '0x0000000000000000000000000000000000000000') {
-                const implementationAbi = await this._get(address, network, metadata)
-                return proxyFetchMode === 'implementationOnly' ? implementationAbi : [...originalAbi, ...implementationAbi]
+              if (
+                address &&
+                address !== '0x0000000000000000000000000000000000000000'
+              ) {
+                const implementationAbi = await this._get(
+                  address,
+                  network,
+                  metadata
+                )
+                return proxyFetchMode === 'implementationOnly'
+                  ? implementationAbi
+                  : [...originalAbi, ...implementationAbi]
               }
-            } catch (error) {
-
-            }
+            } catch (error) {}
           }
-        } catch (error) {
-
-        }
+        } catch (error) {}
       }
     }
 
