@@ -3,8 +3,7 @@ name: dev-npm-publish
 on:
   push:
     branches:
-      - 'master'
-
+      - "master"
 
 jobs:
   dev-npm-publish:
@@ -14,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 20
       - name: Resolve version
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
@@ -31,4 +30,3 @@ jobs:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
           tag: dev
           access: public
-
