@@ -47,7 +47,8 @@ const DEFAULTS: IAbiFetcherOptions = {
     mode: 'https://api.routescan.io/v2/network/mainnet/evm/34443/etherscan/api',
     blast: 'https://api.blastscan.io/api',
     linea: 'https://api.lineascan.build/api',
-    aurora: 'https://explorer.aurora.dev/api'
+    aurora: 'https://explorer.aurora.dev/api',
+    sonic: 'https://api.routescan.io/v2/network/mainnet/evm/146/etherscan/api'
   },
   networkToBlockscoutV4Graph: {},
   networkToBlockscoutV5Api: {
