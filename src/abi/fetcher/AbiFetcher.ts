@@ -29,7 +29,8 @@ const DEFAULTS: IAbiFetcherOptions = {
     scroll: 'https://rpc.ankr.com/scroll',
     mode: 'https://1rpc.io/mode',
     blast: 'https://rpc.blast.io',
-    linea: 'https://1rpc.io/linea'
+    linea: 'https://1rpc.io/linea',
+    sonic: 'https://rpc.ankr.com/sonic_mainnet'
   },
   networkToEtherscanAPI: {
     polygon: 'https://api.polygonscan.com/api',
@@ -48,7 +49,7 @@ const DEFAULTS: IAbiFetcherOptions = {
     blast: 'https://api.blastscan.io/api',
     linea: 'https://api.lineascan.build/api',
     aurora: 'https://explorer.aurora.dev/api',
-    sonic: 'https://api.routescan.io/v2/network/mainnet/evm/146/etherscan/api'
+    sonic: 'https://api.sonicscan.org/api'
   },
   networkToBlockscoutV4Graph: {},
   networkToBlockscoutV5Api: {
