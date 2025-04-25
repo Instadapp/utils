@@ -387,6 +387,118 @@ export class AbiFetcher {
             } catch (error) {}
           }
         } catch (error) {}
+      } else if (
+        // FLUID Contract
+        (originalAbi || []).some(i => i.name === 'FluidSafeTransferError') &&
+        // DEX or VAULT
+        ((originalAbi || []).some(i => i.name === 'FluidDexSwapResult') ||
+          (originalAbi || []).some(i => i.name === 'VAULT_ID'))
+      ) {
+        const contract = new Contract(
+          contractAddress,
+          [
+            {
+              inputs: [],
+              name: 'constantsView',
+              outputs: [
+                {
+                  components: [
+                    {
+                      internalType: 'address',
+                      name: 'liquidity',
+                      type: 'address'
+                    },
+                    {
+                      internalType: 'address',
+                      name: 'factory',
+                      type: 'address'
+                    },
+                    {
+                      internalType: 'address',
+                      name: 'adminImplementation',
+                      type: 'address'
+                    },
+                    {
+                      internalType: 'address',
+                      name: 'secondaryImplementation',
+                      type: 'address'
+                    },
+                    {
+                      internalType: 'address',
+                      name: 'supplyToken',
+                      type: 'address'
+                    },
+                    {
+                      internalType: 'address',
+                      name: 'borrowToken',
+                      type: 'address'
+                    },
+                    {
+                      internalType: 'uint8',
+                      name: 'supplyDecimals',
+                      type: 'uint8'
+                    },
+                    {
+                      internalType: 'uint8',
+                      name: 'borrowDecimals',
+                      type: 'uint8'
+                    },
+                    {
+                      internalType: 'uint256',
+                      name: 'vaultId',
+                      type: 'uint256'
+                    },
+                    {
+                      internalType: 'bytes32',
+                      name: 'liquiditySupplyExchangePriceSlot',
+                      type: 'bytes32'
+                    },
+                    {
+                      internalType: 'bytes32',
+                      name: 'liquidityBorrowExchangePriceSlot',
+                      type: 'bytes32'
+                    },
+                    {
+                      internalType: 'bytes32',
+                      name: 'liquidityUserSupplySlot',
+                      type: 'bytes32'
+                    },
+                    {
+                      internalType: 'bytes32',
+                      name: 'liquidityUserBorrowSlot',
+                      type: 'bytes32'
+                    }
+                  ],
+                  internalType: 'struct Structs.ConstantViews',
+                  name: 'constantsView_',
+                  type: 'tuple'
+                }
+              ],
+              stateMutability: 'view',
+              type: 'function'
+            }
+          ],
+          provider as any
+        )
+
+        const { adminImplementation, secondaryImplementation } =
+          await contract.constantsView()
+
+        const adminImplAbi = await this._get(
+          adminImplementation,
+          network,
+          metadata
+        )
+
+        const secondaryImplAbi = await this._get(
+          secondaryImplementation,
+          network,
+          metadata
+        )
+
+        return proxyFetchMode === 'implementationOnly'
+          ? [...adminImplAbi, ...secondaryImplAbi]
+          : [...originalAbi, ...adminImplAbi, ...secondaryImplAbi]
       }
     }
 
