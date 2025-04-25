@@ -223,7 +223,7 @@ describe.concurrent(
       expect(abi.length).to.be.greaterThan(50)
     })
 
-    test.only('support fluid vault admin and secondary implementation addresses', async () => {
+    test('support fluid vault admin and secondary implementation addresses', async () => {
       const abi = await defaultAbiFetcher.get(
         '0xeAbBfca72F8a8bf14C4ac59e69ECB2eB69F0811C',
         'mainnet',
