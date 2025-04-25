@@ -405,9 +405,22 @@ export class AbiFetcher {
               metadata
             )
 
+            const operateImplAbi = constantsView.operateImplementation
+              ? await this._get(
+                constantsView.operateImplementation,
+                network,
+                metadata
+              )
+              : []
+
             return proxyFetchMode === 'implementationOnly'
-              ? [...adminImplAbi, ...secondaryImplAbi]
-              : [...originalAbi, ...adminImplAbi, ...secondaryImplAbi]
+              ? [...adminImplAbi, ...secondaryImplAbi, ...operateImplAbi]
+              : [
+                  ...originalAbi,
+                  ...adminImplAbi,
+                  ...secondaryImplAbi,
+                  ...operateImplAbi
+                ]
           }
         } catch (error) {}
       } else if (
