@@ -363,226 +363,52 @@ export class AbiFetcher {
         ((originalAbi || []).some(i => i.name === 'FluidDexSwapResult') ||
           (originalAbi || []).some(i => i.name === 'VAULT_ID'))
       ) {
-        const isDex = (originalAbi || []).some(
-          i => i.name === 'FluidDexSwapResult'
-        )
         const contract = new Contract(
           contractAddress,
-          [
-            {
-              inputs: [],
-              name: 'constantsView',
-              outputs: [
-                isDex
-                  ? {
-                      inputs: [
-                        {
-                          components: [
-                            {
-                              internalType: 'uint256',
-                              name: 'dexId',
-                              type: 'uint256'
-                            },
-                            {
-                              internalType: 'address',
-                              name: 'liquidity',
-                              type: 'address'
-                            },
-                            {
-                              internalType: 'address',
-                              name: 'factory',
-                              type: 'address'
-                            },
-                            {
-                              components: [
-                                {
-                                  internalType: 'address',
-                                  name: 'shift',
-                                  type: 'address'
-                                },
-                                {
-                                  internalType: 'address',
-                                  name: 'admin',
-                                  type: 'address'
-                                },
-                                {
-                                  internalType: 'address',
-                                  name: 'colOperations',
-                                  type: 'address'
-                                },
-                                {
-                                  internalType: 'address',
-                                  name: 'debtOperations',
-                                  type: 'address'
-                                },
-                                {
-                                  internalType: 'address',
-                                  name: 'perfectOperationsAndSwapOut',
-                                  type: 'address'
-                                }
-                              ],
-                              internalType: 'struct Structs.Implementations',
-                              name: 'implementations',
-                              type: 'tuple'
-                            },
-                            {
-                              internalType: 'address',
-                              name: 'deployerContract',
-                              type: 'address'
-                            },
-                            {
-                              internalType: 'address',
-                              name: 'token0',
-                              type: 'address'
-                            },
-                            {
-                              internalType: 'address',
-                              name: 'token1',
-                              type: 'address'
-                            },
-                            {
-                              internalType: 'bytes32',
-                              name: 'supplyToken0Slot',
-                              type: 'bytes32'
-                            },
-                            {
-                              internalType: 'bytes32',
-                              name: 'borrowToken0Slot',
-                              type: 'bytes32'
-                            },
-                            {
-                              internalType: 'bytes32',
-                              name: 'supplyToken1Slot',
-                              type: 'bytes32'
-                            },
-                            {
-                              internalType: 'bytes32',
-                              name: 'borrowToken1Slot',
-                              type: 'bytes32'
-                            },
-                            {
-                              internalType: 'bytes32',
-                              name: 'exchangePriceToken0Slot',
-                              type: 'bytes32'
-                            },
-                            {
-                              internalType: 'bytes32',
-                              name: 'exchangePriceToken1Slot',
-                              type: 'bytes32'
-                            },
-                            {
-                              internalType: 'uint256',
-                              name: 'oracleMapping',
-                              type: 'uint256'
-                            }
-                          ],
-                          internalType: 'struct Structs.ConstantViews',
-                          name: 'constantViews_',
-                          type: 'tuple'
-                        }
-                      ],
-                      stateMutability: 'nonpayable',
-                      type: 'constructor'
-                    }
-                  : {
-                      components: [
-                        {
-                          internalType: 'address',
-                          name: 'liquidity',
-                          type: 'address'
-                        },
-                        {
-                          internalType: 'address',
-                          name: 'factory',
-                          type: 'address'
-                        },
-                        {
-                          internalType: 'address',
-                          name: 'adminImplementation',
-                          type: 'address'
-                        },
-                        {
-                          internalType: 'address',
-                          name: 'secondaryImplementation',
-                          type: 'address'
-                        },
-                        {
-                          internalType: 'address',
-                          name: 'supplyToken',
-                          type: 'address'
-                        },
-                        {
-                          internalType: 'address',
-                          name: 'borrowToken',
-                          type: 'address'
-                        },
-                        {
-                          internalType: 'uint8',
-                          name: 'supplyDecimals',
-                          type: 'uint8'
-                        },
-                        {
-                          internalType: 'uint8',
-                          name: 'borrowDecimals',
-                          type: 'uint8'
-                        },
-                        {
-                          internalType: 'uint256',
-                          name: 'vaultId',
-                          type: 'uint256'
-                        },
-                        {
-                          internalType: 'bytes32',
-                          name: 'liquiditySupplyExchangePriceSlot',
-                          type: 'bytes32'
-                        },
-                        {
-                          internalType: 'bytes32',
-                          name: 'liquidityBorrowExchangePriceSlot',
-                          type: 'bytes32'
-                        },
-                        {
-                          internalType: 'bytes32',
-                          name: 'liquidityUserSupplySlot',
-                          type: 'bytes32'
-                        },
-                        {
-                          internalType: 'bytes32',
-                          name: 'liquidityUserBorrowSlot',
-                          type: 'bytes32'
-                        }
-                      ],
-                      internalType: 'struct Structs.ConstantViews',
-                      name: 'constantsView_',
-                      type: 'tuple'
-                    }
-              ],
-              stateMutability: 'view',
-              type: 'function'
-            }
-          ],
+          originalAbi,
           provider as any
         )
 
         try {
-          const { adminImplementation, secondaryImplementation } =
-            await contract.constantsView()
+          const constantsView = await contract.constantsView()
 
-          const adminImplAbi = await this._get(
-            adminImplementation,
-            network,
-            metadata
-          )
+          if (Array.isArray(constantsView.implementations)) {
+            const implsAbi = []
 
-          const secondaryImplAbi = await this._get(
-            secondaryImplementation,
-            network,
-            metadata
-          )
+            for (const implementationAddress of constantsView.implementations) {
+              const implAbi = await this._get(
+                implementationAddress,
+                network,
+                metadata
+              )
 
-          return proxyFetchMode === 'implementationOnly'
-            ? [...adminImplAbi, ...secondaryImplAbi]
-            : [...originalAbi, ...adminImplAbi, ...secondaryImplAbi]
+              implsAbi.push(...implAbi)
+            }
+
+            return proxyFetchMode === 'implementationOnly'
+              ? implsAbi
+              : [...originalAbi, ...implsAbi]
+          } else {
+            const adminImplementation = constantsView.adminImplementation
+            const secondaryImplementation =
+              constantsView.secondaryImplementation
+
+            const adminImplAbi = await this._get(
+              adminImplementation,
+              network,
+              metadata
+            )
+
+            const secondaryImplAbi = await this._get(
+              secondaryImplementation,
+              network,
+              metadata
+            )
+
+            return proxyFetchMode === 'implementationOnly'
+              ? [...adminImplAbi, ...secondaryImplAbi]
+              : [...originalAbi, ...adminImplAbi, ...secondaryImplAbi]
+          }
         } catch (error) {}
       } else if (
         originalAbi.some(item => item.type === 'fallback') ||

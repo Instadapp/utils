@@ -215,7 +215,7 @@ describe.concurrent(
 
     test('support fluid dex admin and secondary implementation addresses', async () => {
       const abi = await defaultAbiFetcher.get(
-        '0x0B1a513ee24972DAEf112bC777a5610d4325C9e7',
+        '0xF507a38Aaf37339cC3bEAc4C7a58B17401BDf6bc',
         'mainnet',
         'implementationOnly'
       )
