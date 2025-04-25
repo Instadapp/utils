@@ -212,6 +212,26 @@ describe.concurrent(
       )
       expect(abi.length).to.be.greaterThan(0)
     })
+
+    test('support fluid dex admin and secondary implementation addresses', async () => {
+      const abi = await defaultAbiFetcher.get(
+        '0x0B1a513ee24972DAEf112bC777a5610d4325C9e7',
+        'mainnet',
+        'implementationOnly'
+      )
+
+      expect(abi.length).to.be.greaterThan(50)
+    })
+
+    test.only('support fluid vault admin and secondary implementation addresses', async () => {
+      const abi = await defaultAbiFetcher.get(
+        '0xeAbBfca72F8a8bf14C4ac59e69ECB2eB69F0811C',
+        'mainnet',
+        'implementationOnly'
+      )
+
+      expect(abi.length).to.be.greaterThan(24)
+    })
   },
   {
     retry: 2
