@@ -94,7 +94,7 @@ const castDecoder = new CastDecoder();
 // using cast data
 await castDecoder.getSpells(
   "0x9304c934000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000009414156452d56322d410000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000084ce88b439000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000000071afd498d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  "mainnet"
+  "mainnet",
 );
 
 // using encodedSpells
@@ -105,14 +105,14 @@ await castDecoder.getSpells(
       "0xce88b439000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000000071afd498d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
     ],
   },
-  "mainnet"
+  "mainnet",
 );
 
 // decode one encoded spell
 await castDecoder.getSpell(
   "AAVE-V2-A",
   "0xce88b439000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000000071afd498d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  "mainnet"
+  "mainnet",
 );
 ```
 
@@ -155,7 +155,7 @@ const providerWithCustomOptions = new JsonRpcRetryProvider(
   {
     timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
     delay: 300, // delay between retries in ms
-  }
+  },
 );
 ```
 
@@ -165,7 +165,7 @@ import { JsonRpcRetryProvider } from "@instadapp/utils";
 const provider = new JsonRpcRetryProvider([
   "https://rpc.ankr.com/invalid",
   "https://rpc.ankr.com/invalid-2",
-  "https://rpc.ankr.com/eth",
+  "https://1rpc.io/eth",
   "https://eth.llamarpc.com",
 ]);
 ```
@@ -182,7 +182,7 @@ const providerWithCustomOptions = new JsonRpcRetryBatchProvider(
   {
     timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
     delay: 300, // delay between retries in ms
-  }
+  },
 );
 ```
 
@@ -198,7 +198,7 @@ const providerWithCustomOptions = new StaticJsonRpcRetryProvider(
   {
     timeouts: [5_000, 10_000, 15_000], // timeouts for each retry attempt in ms
     delay: 300, // delay between retries in ms
-  }
+  },
 );
 ```
 
@@ -296,9 +296,9 @@ import { ethers } from "ethers";
 let provider = toJsonRpcProvider(window.ethereum); // Metamask, Rabby, ...
 let provider = toJsonRpcProvider(web3); // Web3.js instance, `web3.currentProvider` will be used internally
 let provider = toJsonRpcProvider(web3.currentProvider); // Web3.js provider, ex:  Metamask, Rabby, WalletConnect, ...
-let provider = toJsonRpcProvider("https://rpc.ankr.com/eth"); // Http RPC URL
+let provider = toJsonRpcProvider("https://1rpc.io/eth"); // Http RPC URL
 let provider = toJsonRpcProvider(
-  new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth")
+  new ethers.providers.JsonRpcProvider("https://1rpc.io/eth"),
 ); // ethers JsonRpcProvider instance
 ```
 
@@ -311,21 +311,21 @@ const etherscan = new Blockscan(Chain.Mainnet);
 
 await etherscan.getTransactions("0x6975be450864c02b4613023c2152ee0743572325");
 await etherscan.getInternalTransactions(
-  "0x6975be450864c02b4613023c2152ee0743572325"
+  "0x6975be450864c02b4613023c2152ee0743572325",
 );
 await etherscan.getErc20TokenTransferEvents(
-  "0x6975be450864c02b4613023c2152ee0743572325"
+  "0x6975be450864c02b4613023c2152ee0743572325",
 );
 await etherscan.getErc721TokenTransferEvents(
-  "0x6975be450864c02b4613023c2152ee0743572325"
+  "0x6975be450864c02b4613023c2152ee0743572325",
 );
 await etherscan.getErc1155TokenTransferEvents(
-  "0x6975be450864c02b4613023c2152ee0743572325"
+  "0x6975be450864c02b4613023c2152ee0743572325",
 );
 
 const basescan = Blockscan.custom(
   "https://basescan.org",
-  "https://api.basescan.org/api"
+  "https://api.basescan.org/api",
 );
 await basescan.contractSourceCode("0x833589fcd6edb6e08f4c7c32d4f71b54bda02913");
 ```

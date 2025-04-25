@@ -481,24 +481,26 @@ export class AbiFetcher {
           provider as any
         )
 
-        const { adminImplementation, secondaryImplementation } =
-          await contract.constantsView()
+        try {
+          const { adminImplementation, secondaryImplementation } =
+            await contract.constantsView()
 
-        const adminImplAbi = await this._get(
-          adminImplementation,
-          network,
-          metadata
-        )
+          const adminImplAbi = await this._get(
+            adminImplementation,
+            network,
+            metadata
+          )
 
-        const secondaryImplAbi = await this._get(
-          secondaryImplementation,
-          network,
-          metadata
-        )
+          const secondaryImplAbi = await this._get(
+            secondaryImplementation,
+            network,
+            metadata
+          )
 
-        return proxyFetchMode === 'implementationOnly'
-          ? [...adminImplAbi, ...secondaryImplAbi]
-          : [...originalAbi, ...adminImplAbi, ...secondaryImplAbi]
+          return proxyFetchMode === 'implementationOnly'
+            ? [...adminImplAbi, ...secondaryImplAbi]
+            : [...originalAbi, ...adminImplAbi, ...secondaryImplAbi]
+        } catch (error) {}
       }
     }
 
