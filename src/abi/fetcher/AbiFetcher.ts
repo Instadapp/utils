@@ -378,6 +378,7 @@ export class AbiFetcher {
             await Promise.all(
               constantsView.implementations.map(
                 async (implementationAddress: string) => {
+                  if (implementationAddress === '0x0000000000000000000000000000000000000000') { return }
                   const implAbi = await this._get(
                     implementationAddress,
                     network,
