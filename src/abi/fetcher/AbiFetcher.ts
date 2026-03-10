@@ -375,15 +375,18 @@ export class AbiFetcher {
           if (Array.isArray(constantsView.implementations)) {
             const implsAbi = []
 
-            for (const implementationAddress of constantsView.implementations) {
-              const implAbi = await this._get(
-                implementationAddress,
-                network,
-                metadata
+            await Promise.all(
+              constantsView.implementations.map(
+                async (implementationAddress: string) => {
+                  const implAbi = await this._get(
+                    implementationAddress,
+                    network,
+                    metadata
+                  )
+                  implsAbi.push(...implAbi)
+                }
               )
-
-              implsAbi.push(...implAbi)
-            }
+            )
 
             return proxyFetchMode === 'implementationOnly'
               ? implsAbi
@@ -393,17 +396,10 @@ export class AbiFetcher {
             const secondaryImplementation =
               constantsView.secondaryImplementation
 
-            const adminImplAbi = await this._get(
-              adminImplementation,
-              network,
-              metadata
-            )
-
-            const secondaryImplAbi = await this._get(
-              secondaryImplementation,
-              network,
-              metadata
-            )
+            const [adminImplAbi, secondaryImplAbi] = await Promise.all([
+              this._get(adminImplementation, network, metadata),
+              this._get(secondaryImplementation, network, metadata)
+            ])
 
             const operateImplAbi = constantsView.operateImplementation
               ? await this._get(
